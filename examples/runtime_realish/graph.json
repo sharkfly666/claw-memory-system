@@ -1,0 +1,85 @@
+{
+  "schema_version": "graph.v1",
+  "updated_at": "2026-03-13T13:58:08+08:00",
+  "nodes": {
+    "task-memory-eval": {
+      "node_type": "task",
+      "label": "memory evaluation task",
+      "node_id": "task-memory-eval",
+      "created_at": "2026-03-13T13:46:48+08:00",
+      "updated_at": "2026-03-13T13:58:08+08:00"
+    },
+    "ep-memory-validation": {
+      "node_type": "episode",
+      "label": "memory loss validation",
+      "node_id": "ep-memory-validation",
+      "created_at": "2026-03-13T13:46:48+08:00",
+      "updated_at": "2026-03-13T13:58:08+08:00"
+    },
+    "ep-qwik-eval": {
+      "node_type": "episode",
+      "label": "qwik vue2 evaluation",
+      "node_id": "ep-qwik-eval",
+      "created_at": "2026-03-13T13:46:48+08:00",
+      "updated_at": "2026-03-13T13:58:08+08:00"
+    }
+  },
+  "edges": [
+    {
+      "source": "task-memory-eval",
+      "relation": "summarized_by",
+      "target": "ep-memory-validation",
+      "attrs": {},
+      "created_at": "2026-03-13T13:46:48+08:00"
+    },
+    {
+      "source": "task-memory-eval",
+      "relation": "related_to",
+      "target": "ep-qwik-eval",
+      "attrs": {},
+      "created_at": "2026-03-13T13:46:48+08:00"
+    },
+    {
+      "source": "task-memory-eval",
+      "relation": "summarized_by",
+      "target": "ep-memory-validation",
+      "attrs": {},
+      "created_at": "2026-03-13T13:50:20+08:00"
+    },
+    {
+      "source": "task-memory-eval",
+      "relation": "related_to",
+      "target": "ep-qwik-eval",
+      "attrs": {},
+      "created_at": "2026-03-13T13:50:20+08:00"
+    },
+    {
+      "source": "task-memory-eval",
+      "relation": "summarized_by",
+      "target": "ep-memory-validation",
+      "attrs": {},
+      "created_at": "2026-03-13T13:55:37+08:00"
+    },
+    {
+      "source": "task-memory-eval",
+      "relation": "related_to",
+      "target": "ep-qwik-eval",
+      "attrs": {},
+      "created_at": "2026-03-13T13:55:37+08:00"
+    },
+    {
+      "source": "task-memory-eval",
+      "relation": "summarized_by",
+      "target": "ep-memory-validation",
+      "attrs": {},
+      "created_at": "2026-03-13T13:58:08+08:00"
+    },
+    {
+      "source": "task-memory-eval",
+      "relation": "related_to",
+      "target": "ep-qwik-eval",
+      "attrs": {},
+      "created_at": "2026-03-13T13:58:08+08:00"
+    }
+  ]
+}

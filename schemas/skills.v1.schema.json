@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skills.v1.schema.json",
+  "title": "Skills Store V1",
+  "type": "object",
+  "required": ["schema_version", "skills"],
+  "properties": {
+    "schema_version": { "const": "skills.v1" },
+    "updated_at": { "type": "string" },
+    "skills": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["skill_id", "created_at", "updated_at"],
+        "properties": {
+          "skill_id": { "type": "string" },
+          "title": { "type": "string" },
+          "summary": { "type": "string" },
+          "installed": { "type": "boolean" },
+          "source_task_ids": { "type": "array", "items": { "type": "string" } },
+          "quality_score": { "type": "number" },
+          "usage_count": { "type": "integer" },
+          "last_used_at": { "type": ["string", "null"] },
+          "evolution_status": { "type": "string" },
+          "proposed_by_model": { "type": ["string", "null"] },
+          "created_at": { "type": "string" },
+          "updated_at": { "type": "string" }
+        }
+      }
+    }
+  }
+}

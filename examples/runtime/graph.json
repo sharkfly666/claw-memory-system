@@ -1,0 +1,29 @@
+{
+  "schema_version": "graph.v1",
+  "updated_at": "2026-03-13T13:28:14+08:00",
+  "nodes": {
+    "task-memory-v2": {
+      "node_type": "task",
+      "label": "Build OpenClaw Memory V2 skeleton",
+      "node_id": "task-memory-v2",
+      "created_at": "2026-03-13T13:28:14+08:00",
+      "updated_at": "2026-03-13T13:28:14+08:00"
+    },
+    "ep-memory-discussion": {
+      "node_type": "episode",
+      "label": "Memory redesign discussion",
+      "node_id": "ep-memory-discussion",
+      "created_at": "2026-03-13T13:28:14+08:00",
+      "updated_at": "2026-03-13T13:28:14+08:00"
+    }
+  },
+  "edges": [
+    {
+      "source": "task-memory-v2",
+      "relation": "summarized_by",
+      "target": "ep-memory-discussion",
+      "attrs": {},
+      "created_at": "2026-03-13T13:28:14+08:00"
+    }
+  ]
+}

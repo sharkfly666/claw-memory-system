@@ -1,0 +1,92 @@
+[
+  {
+    "case_id": "real-001",
+    "query": "direct efficient communication",
+    "expected_sources": ["preferences"],
+    "description": "用户偏好：直接高效"
+  },
+  {
+    "case_id": "real-002",
+    "query": "proactive autonomous collaboration",
+    "expected_sources": ["preferences"],
+    "description": "用户偏好：主动积极自主行动"
+  },
+  {
+    "case_id": "real-003",
+    "query": "technical architecture judgment",
+    "expected_sources": ["preferences"],
+    "description": "用户画像：技术背景强，偏架构判断"
+  },
+  {
+    "case_id": "real-004",
+    "query": "memory evaluation task",
+    "expected_sources": ["tasks", "sessions"],
+    "description": "当前任务：评估新记忆系统"
+  },
+  {
+    "case_id": "real-005",
+    "query": "memory loss validation",
+    "expected_sources": ["tasks", "episodes"],
+    "description": "任务：验证记忆是否丢失"
+  },
+  {
+    "case_id": "real-006",
+    "query": "memory minscore configuration",
+    "expected_sources": ["facts", "episodes"],
+    "description": "配置：memory minScore 相关"
+  },
+  {
+    "case_id": "real-007",
+    "query": "gateway restart memory config",
+    "expected_sources": ["episodes", "facts"],
+    "description": "动作：重启 Gateway 使配置生效"
+  },
+  {
+    "case_id": "real-008",
+    "query": "workspace path",
+    "expected_sources": ["facts"],
+    "description": "事实：workspace 路径"
+  },
+  {
+    "case_id": "real-009",
+    "query": "daily briefing 8:00",
+    "expected_sources": ["facts", "episodes"],
+    "description": "事实：每日早报 8 点"
+  },
+  {
+    "case_id": "real-010",
+    "query": "briefing timeout send failure",
+    "expected_sources": ["episodes", "tasks"],
+    "description": "问题：早报超时 / 发送失败"
+  },
+  {
+    "case_id": "real-011",
+    "query": "memos worse than old approach",
+    "expected_sources": ["episodes", "tasks"],
+    "description": "当前判断：新 memos 不如旧方案"
+  },
+  {
+    "case_id": "real-012",
+    "query": "qwik vue2 evaluation",
+    "expected_sources": ["episodes", "tasks"],
+    "description": "议题：Qwik 与 Vue2 团队引入评估"
+  },
+  {
+    "case_id": "real-013",
+    "query": "vue3 nuxt3 preferred upgrade path",
+    "expected_sources": ["episodes", "tasks"],
+    "description": "结论：Vue2 优先升级 Vue3 / Nuxt3"
+  },
+  {
+    "case_id": "real-014",
+    "query": "pansou multi cloud search",
+    "expected_sources": ["facts", "episodes"],
+    "description": "事实：PanSou 多网盘搜索服务"
+  },
+  {
+    "case_id": "real-015",
+    "query": "memory redesign discussion",
+    "expected_sources": ["episodes"],
+    "description": "历史讨论：记忆系统重构"
+  }
+]

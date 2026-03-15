@@ -1,0 +1,87 @@
+{
+  "id": "claw-memory-system",
+  "name": "Claw Memory System",
+  "description": "OpenClaw tool plugin bridge for facts, exact search, migration checks, and workspace bootstrap.",
+  "version": "0.1.0",
+  "kind": "tool",
+  "requirements": {
+    "node": ">=18.0.0",
+    "openclaw": ">=2026.2.0"
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "pythonBin": {
+        "type": "string",
+        "default": "python3",
+        "description": "Python executable used to run repo-owned bridge commands."
+      },
+      "repoPath": {
+        "type": "string",
+        "description": "Optional override for the claw-memory-system repository root."
+      },
+      "workspaceDir": {
+        "type": "string",
+        "description": "Optional default OpenClaw workspace path. Defaults to ~/.openclaw/workspace."
+      },
+      "openclawHome": {
+        "type": "string",
+        "description": "Optional default OpenClaw home path. Defaults to ~/.openclaw."
+      },
+      "openclawBin": {
+        "type": "string",
+        "default": "openclaw",
+        "description": "OpenClaw executable name used for deep integration checks."
+      },
+      "adminHost": {
+        "type": "string",
+        "default": "127.0.0.1",
+        "description": "Host used by the auto-started local admin HTTP process."
+      },
+      "adminPort": {
+        "type": "integer",
+        "default": 8765,
+        "description": "Port used by the auto-started local admin HTTP process."
+      },
+      "autoStartAdmin": {
+        "type": "boolean",
+        "default": true,
+        "description": "Automatically bootstrap the workspace and start the local admin HTTP process when the gateway starts."
+      },
+      "autoTurnCapture": {
+        "type": "boolean",
+        "default": false,
+        "description": "Enable queue-only autonomous turn capture when lifecycle wiring is available. Defaults off for release safety."
+      },
+      "autoTurnQueueOnly": {
+        "type": "boolean",
+        "default": true,
+        "description": "When autonomous turn capture is enabled, only queue pending candidates and do not write structured memory directly."
+      },
+      "turnCaptureMinConfidence": {
+        "type": "number",
+        "default": 0.88,
+        "description": "Minimum classifier confidence for direct handling decisions. Lower-confidence items should remain queued or ignored."
+      },
+      "batchGovernanceEnabled": {
+        "type": "boolean",
+        "default": true,
+        "description": "Whether batch governance automation is enabled."
+      },
+      "batchGovernanceEvery": {
+        "type": "string",
+        "default": "6h",
+        "description": "Recommended cadence for autonomous batch governance."
+      }
+    }
+  },
+  "setup": {
+    "notes": [
+      "Keep memory-lancedb-pro as the active memory slot for semantic recall.",
+      "Use this plugin for facts, exact search, bootstrap, and integration diagnostics.",
+      "If installed from a package copy, ensure the bundled repo contains src/, scripts/, schemas/, and webapp/.",
+      "When the OpenClaw gateway is running, the management console is served under /plugins/claw-memory-system."
+    ]
+  }
+}

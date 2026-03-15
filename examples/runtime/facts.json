@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "facts": {
+    "agent.workspace_path": {
+      "value": "/Users/jiangjk/.openclaw/workspace",
+      "value_type": "string",
+      "category": "fact",
+      "status": "active",
+      "updated_at": "2026-03-13T13:28:14+08:00",
+      "created_at": "2026-03-13T13:28:14+08:00",
+      "last_verified": "2026-03-13T13:28:14+08:00",
+      "valid_from": "2026-03-13T13:28:14+08:00",
+      "valid_to": null,
+      "ttl_days": null,
+      "confidence": 1.0,
+      "source": "demo",
+      "scope": "global",
+      "aliases": [],
+      "tags": [],
+      "notes": "Default OpenClaw workspace path",
+      "superseded_by": null
+    }
+  },
+  "updated_at": "2026-03-13T13:28:14+08:00"
+}

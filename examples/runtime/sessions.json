@@ -1,0 +1,29 @@
+{
+  "schema_version": "session.v1",
+  "updated_at": "2026-03-13T13:28:14+08:00",
+  "sessions": {
+    "main": {
+      "active_topics": [
+        "memory v2",
+        "search router",
+        "evaluation"
+      ],
+      "active_task_ids": [
+        "task-memory-v2"
+      ],
+      "recent_decisions": [
+        "upgrade existing claw-memory-system instead of rewriting"
+      ],
+      "open_questions": [
+        "when to add admin api"
+      ],
+      "next_actions": [
+        "implement second round"
+      ],
+      "session_key": "main",
+      "created_at": "2026-03-13T13:28:14+08:00",
+      "updated_at": "2026-03-13T13:28:14+08:00",
+      "status": "active"
+    }
+  }
+}

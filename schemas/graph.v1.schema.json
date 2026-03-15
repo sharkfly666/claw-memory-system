@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "graph.v1.schema.json",
+  "title": "Graph Store V1",
+  "type": "object",
+  "required": ["schema_version", "nodes", "edges"],
+  "properties": {
+    "schema_version": { "const": "graph.v1" },
+    "updated_at": { "type": "string" },
+    "nodes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["node_id", "created_at", "updated_at"],
+        "properties": {
+          "node_id": { "type": "string" },
+          "node_type": { "type": "string" },
+          "label": { "type": "string" },
+          "attrs": { "type": "object" },
+          "created_at": { "type": "string" },
+          "updated_at": { "type": "string" }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source", "relation", "target", "created_at"],
+        "properties": {
+          "source": { "type": "string" },
+          "relation": { "type": "string" },
+          "target": { "type": "string" },
+          "attrs": { "type": "object" },
+          "created_at": { "type": "string" }
+        }
+      }
+    }
+  }
+}

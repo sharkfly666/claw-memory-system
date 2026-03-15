@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "claw-memory-system"
+version = "0.1.0"
+description = "Local-first hybrid memory system for AI agents"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "jiangjk" }]
+dependencies = []
+
+[project.scripts]
+claw-memory-build-index = "claw_memory_system.build_pageindex:main"
+claw-memory-search-index = "claw_memory_system.search_pageindex:main"
+claw-memory-facts = "claw_memory_system.facts_cli:main"
+claw-memory-extract-facts = "claw_memory_system.extract_fact_candidates:main"
+claw-memory-bootstrap-openclaw = "claw_memory_system.bootstrap_openclaw_instance:main"
+claw-memory-openclaw-plugin-bridge = "claw_memory_system.openclaw_plugin_bridge:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://claw-memory-system.local/schemas/pageindex-doc.v1.schema.json",
+  "title": "PageIndex Document v1",
+  "type": "object",
+  "required": ["doc_id", "source_type", "text"],
+  "properties": {
+    "doc_id": { "type": "string" },
+    "source_type": { "type": "string" },
+    "source_path": { "type": ["string", "null"] },
+    "title": { "type": ["string", "null"] },
+    "entity": { "type": ["string", "null"] },
+    "key": { "type": ["string", "null"] },
+    "aliases": { "type": ["string", "null"] },
+    "tags": { "type": ["string", "null"] },
+    "text": { "type": "string" },
+    "scope": { "type": ["string", "null"] },
+    "status": { "type": ["string", "null"] },
+    "created_at": { "type": ["string", "null"] },
+    "updated_at": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

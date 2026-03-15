@@ -1,0 +1,2369 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenClaw Memory Console</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23111827'/%3E%3Cpath d='M18 21h15c8.8 0 14 4.9 14 11.6 0 7.2-5.7 12.4-14.8 12.4H18V21zm9 7.2v9.4h5c3.5 0 5.8-1.8 5.8-4.8 0-2.9-2.1-4.6-5.7-4.6h-5.1z' fill='%23dbeafe'/%3E%3C/svg%3E" />
+  <style>
+    :root {
+      --bg: #eef2fb;
+      --bg-deep: #d8e2ff;
+      --panel: rgba(255, 255, 255, 0.92);
+      --panel-2: #edf3ff;
+      --panel-3: #f7f9ff;
+      --text: #162033;
+      --muted: #60708f;
+      --line: rgba(0, 47, 167, 0.12);
+      --primary: #002fa7;
+      --primary-strong: #0a2cb8;
+      --primary-weak: rgba(0, 47, 167, 0.1);
+      --primary-glow: rgba(0, 47, 167, 0.18);
+      --success: #0f8a62;
+      --warning: #c77d0a;
+      --danger: #c73845;
+      --shadow: 0 16px 40px rgba(12, 28, 72, 0.08);
+      --shadow-strong: 0 24px 60px rgba(0, 47, 167, 0.18);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", "Avenir Next", "PingFang SC", "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(0, 47, 167, 0.18), transparent 28%),
+        linear-gradient(180deg, #f6f8ff 0%, var(--bg) 52%, #eef3ff 100%);
+    }
+    .app {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 100vh;
+    }
+    .sidebar {
+      background:
+        linear-gradient(180deg, rgba(3, 24, 88, 0.98) 0%, rgba(2, 47, 167, 0.96) 62%, rgba(16, 40, 112, 0.98) 100%);
+      color: #fff;
+      padding: 24px 18px;
+      border-right: 1px solid rgba(255,255,255,0.08);
+      box-shadow: inset -1px 0 0 rgba(255,255,255,0.06);
+    }
+    .brand {
+      font-family: "DIN Alternate", "Avenir Next Condensed", "IBM Plex Sans", sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .brand-sub {
+      color: rgba(255,255,255,0.7);
+      font-size: 13px;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .nav-section {
+      margin-bottom: 20px;
+    }
+    .nav-title {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      letter-spacing: 0.08em;
+    }
+    .nav-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      border: 0;
+      background: transparent;
+      color: rgba(255,255,255,0.9);
+      padding: 12px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-bottom: 4px;
+      transition: background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+    }
+    .nav-btn:hover, .nav-btn.active {
+      background: rgba(255,255,255,0.12);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+      transform: translateX(2px);
+    }
+    .main {
+      padding: 28px 30px 36px;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding: 22px 24px;
+      border: 1px solid rgba(255,255,255,0.7);
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(0, 47, 167, 0.08), rgba(255,255,255,0.88) 58%);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+    .topbar h1 {
+      margin: 0;
+      font-family: "Avenir Next Condensed", "DIN Alternate", "IBM Plex Sans", sans-serif;
+      font-size: 30px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .topbar p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      max-width: 620px;
+      line-height: 1.55;
+    }
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    select, input, textarea, button {
+      font: inherit;
+    }
+    select, input, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+    }
+    textarea { min-height: 96px; }
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 16px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-strong) 100%);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 12px 28px var(--primary-glow);
+      transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+    }
+    .btn.secondary {
+      background: rgba(255,255,255,0.78);
+      color: var(--text);
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 30px var(--primary-glow);
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 18px;
+      backdrop-filter: blur(12px);
+    }
+    .panel h2 { margin-top: 0; margin-bottom: 8px; font-size: 18px; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .metric {
+      background: linear-gradient(180deg, var(--panel-2) 0%, rgba(255,255,255,0.96) 100%);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+    .metric .value {
+      font-family: "Avenir Next Condensed", "DIN Alternate", "IBM Plex Sans", sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    .metric .label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .content-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 16px;
+    }
+    .split-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .list-box {
+      border: 1px solid var(--line);
+      background: var(--panel-3);
+      border-radius: 14px;
+      min-height: 220px;
+      max-height: 320px;
+      overflow: auto;
+    }
+    .list-item {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(15, 32, 65, 0.06);
+      cursor: pointer;
+      line-height: 1.45;
+    }
+    .list-item:hover { background: rgba(0, 47, 167, 0.06); }
+    .detail-box {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.82);
+      border-radius: 14px;
+      min-height: 220px;
+      padding: 14px;
+      overflow: auto;
+      white-space: pre-wrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    .form-grid {
+      display: grid;
+      gap: 10px;
+    }
+    .hidden { display: none; }
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.74);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid rgba(0, 47, 167, 0.12);
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .panel-eyebrow {
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .panel-klein {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(237,243,255,0.96) 100%),
+        linear-gradient(135deg, rgba(0, 47, 167, 0.07), transparent 55%);
+      position: relative;
+      overflow: hidden;
+    }
+    .panel-klein::after {
+      content: "";
+      position: absolute;
+      inset: auto -40px -40px auto;
+      width: 160px;
+      height: 160px;
+      background: radial-gradient(circle, rgba(0, 47, 167, 0.16), transparent 65%);
+      pointer-events: none;
+    }
+    .status-strip {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(0, 47, 167, 0.12);
+      background: rgba(0, 47, 167, 0.06);
+      color: var(--text);
+      line-height: 1.55;
+    }
+    .kv-box {
+      min-height: 156px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      font-family: "IBM Plex Sans", "Avenir Next", "PingFang SC", sans-serif;
+      font-size: 13px;
+      white-space: normal;
+    }
+    .kv-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed rgba(0, 47, 167, 0.12);
+    }
+    .kv-row:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+    .kv-key {
+      color: var(--muted);
+      word-break: break-word;
+    }
+    .kv-value {
+      color: var(--text);
+      font-weight: 700;
+      text-align: right;
+    }
+    .list-caption {
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .semantic-recent-detail {
+      min-height: 320px;
+    }
+    .graph-console {
+      position: relative;
+      overflow: hidden;
+    }
+    .graph-controls {
+      display: grid;
+      grid-template-columns: minmax(220px, 1.2fr) minmax(180px, 0.8fr) minmax(240px, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+      position: relative;
+      z-index: 1;
+    }
+    .graph-control-field {
+      display: grid;
+      gap: 8px;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(0, 47, 167, 0.12);
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(237,243,255,0.82));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+    }
+    .graph-control-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .graph-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .graph-legend-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 47, 167, 0.12);
+      background: rgba(255,255,255,0.74);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .graph-legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      flex: 0 0 auto;
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.7);
+    }
+    .graph-stat-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      position: relative;
+      z-index: 1;
+    }
+    .graph-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(340px, 0.95fr);
+      gap: 16px;
+      margin-top: 16px;
+      position: relative;
+      z-index: 1;
+    }
+    .graph-stage-card,
+    .graph-side-panel {
+      border: 1px solid rgba(0, 47, 167, 0.12);
+      border-radius: 18px;
+      padding: 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.86), rgba(242,246,255,0.92));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+    .graph-canvas-shell {
+      position: relative;
+      min-height: 640px;
+      border-radius: 22px;
+      overflow: hidden;
+      border: 1px solid rgba(0, 47, 167, 0.16);
+      background:
+        radial-gradient(circle at top left, rgba(0, 47, 167, 0.22), transparent 30%),
+        linear-gradient(180deg, rgba(255,255,255,0.94), rgba(225,233,255,0.96));
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.8),
+        inset 0 -18px 50px rgba(0, 47, 167, 0.08);
+      touch-action: none;
+      user-select: none;
+    }
+    .graph-canvas-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 47, 167, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 47, 167, 0.06) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: radial-gradient(circle at center, rgba(0,0,0,0.88), transparent 92%);
+      pointer-events: none;
+    }
+    .graph-stage-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+    .graph-stage-copy {
+      display: grid;
+      gap: 6px;
+    }
+    .graph-stage-kicker {
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .graph-stage-title {
+      font-family: "Avenir Next Condensed", "DIN Alternate", "IBM Plex Sans", sans-serif;
+      font-size: 22px;
+      line-height: 1.05;
+      letter-spacing: 0.03em;
+      color: #10285f;
+      text-transform: uppercase;
+    }
+    .graph-stage-subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+      max-width: 560px;
+    }
+    .graph-stage-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .graph-zoom-controls {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 6px;
+      border-radius: 16px;
+      border: 1px solid rgba(0, 47, 167, 0.12);
+      background: rgba(255,255,255,0.82);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+    .graph-tool-btn {
+      min-width: 74px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .graph-viewport-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 47, 167, 0.14);
+      background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(233,240,255,0.9));
+      color: #10285f;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+    #graphCanvas {
+      display: block;
+      width: 100%;
+      height: 640px;
+      position: relative;
+      z-index: 1;
+      cursor: grab;
+    }
+    #graphCanvas.is-dragging {
+      cursor: grabbing;
+    }
+    .graph-edge {
+      fill: none;
+      stroke: rgba(63, 89, 154, 0.24);
+      stroke-width: 2;
+      transition: stroke 180ms ease, stroke-width 180ms ease, opacity 180ms ease;
+    }
+    .graph-edge.is-selected {
+      stroke: rgba(0, 47, 167, 0.78);
+      stroke-width: 3.2;
+    }
+    .graph-node {
+      cursor: pointer;
+      transition: transform 180ms ease, opacity 180ms ease;
+    }
+    .graph-node .graph-node-glow {
+      fill: rgba(0, 47, 167, 0.08);
+      transition: fill 180ms ease, opacity 180ms ease;
+    }
+    .graph-node .graph-node-card {
+      fill: rgba(255,255,255,0.94);
+      stroke-width: 1.6;
+      filter: drop-shadow(0 12px 28px rgba(0, 47, 167, 0.14));
+      transition: stroke-width 180ms ease, filter 180ms ease, transform 180ms ease;
+    }
+    .graph-node.is-selected .graph-node-glow {
+      fill: rgba(0, 47, 167, 0.16);
+    }
+    .graph-node.is-selected .graph-node-card {
+      stroke-width: 2.8;
+      filter: drop-shadow(0 16px 34px rgba(0, 47, 167, 0.26));
+    }
+    .graph-node.is-primary .graph-node-card {
+      filter: drop-shadow(0 14px 30px rgba(0, 47, 167, 0.22));
+    }
+    .graph-node-accent {
+      opacity: 0.18;
+    }
+    .graph-node-title {
+      font-family: "IBM Plex Sans", "Avenir Next", "PingFang SC", sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      fill: #132a5d;
+      letter-spacing: 0.01em;
+    }
+    .graph-node-micro {
+      font-family: "IBM Plex Sans", "Avenir Next", "PingFang SC", sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      fill: rgba(20, 44, 87, 0.7);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .graph-node-degree {
+      font-family: "Avenir Next Condensed", "DIN Alternate", "IBM Plex Sans", sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      fill: rgba(0, 47, 167, 0.84);
+    }
+    .graph-node-label {
+      font-family: "IBM Plex Sans", "Avenir Next", "PingFang SC", sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      fill: #17305f;
+      text-anchor: middle;
+      pointer-events: none;
+      letter-spacing: 0.02em;
+    }
+    .graph-node-caption {
+      font-family: "IBM Plex Sans", "Avenir Next", "PingFang SC", sans-serif;
+      font-size: 10px;
+      fill: rgba(20, 44, 87, 0.72);
+      text-anchor: middle;
+      pointer-events: none;
+    }
+    .graph-lane-column {
+      fill: rgba(255,255,255,0.32);
+      stroke: rgba(0, 47, 167, 0.08);
+      stroke-width: 1;
+    }
+    .graph-lane-title {
+      font-family: "Avenir Next Condensed", "DIN Alternate", "IBM Plex Sans", sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      fill: rgba(16, 40, 95, 0.88);
+      text-anchor: middle;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .graph-lane-meta {
+      font-family: "IBM Plex Sans", "Avenir Next", "PingFang SC", sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      fill: rgba(20, 44, 87, 0.54);
+      text-anchor: middle;
+      letter-spacing: 0.03em;
+    }
+    .graph-empty-state {
+      font-family: "IBM Plex Sans", "Avenir Next", "PingFang SC", sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      fill: var(--muted);
+    }
+    .graph-detail-box {
+      font-family: "IBM Plex Sans", "Avenir Next", "PingFang SC", sans-serif;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: normal;
+    }
+    .graph-detail-title {
+      font-family: "Avenir Next Condensed", "DIN Alternate", "IBM Plex Sans", sans-serif;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+      margin-bottom: 6px;
+      color: #17305f;
+      word-break: break-word;
+    }
+    .graph-detail-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0 14px;
+    }
+    .graph-detail-meta span {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0, 47, 167, 0.08);
+      border: 1px solid rgba(0, 47, 167, 0.1);
+      font-size: 12px;
+      font-weight: 700;
+      color: #17305f;
+    }
+    .graph-side-rail {
+      display: grid;
+      gap: 14px;
+    }
+    .graph-inspector-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .graph-mini-note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .graph-edge-item {
+      padding: 10px 0;
+      border-bottom: 1px dashed rgba(0, 47, 167, 0.12);
+    }
+    .graph-edge-item:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+    .graph-edge-relation {
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    .graph-edge-route {
+      color: var(--text);
+      font-weight: 600;
+      word-break: break-word;
+    }
+    @media (max-width: 980px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .split-grid { grid-template-columns: 1fr; }
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .graph-controls { grid-template-columns: 1fr; }
+      .graph-layout { grid-template-columns: 1fr; }
+      .graph-inspector-grid { grid-template-columns: 1fr; }
+      .graph-stage-toolbar { flex-direction: column; }
+      .graph-stage-actions { justify-content: flex-start; }
+      .topbar { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">OpenClaw Memory</div>
+      <div class="brand-sub" data-i18n="sidebar.subtitle">Commercial-grade memory console prototype</div>
+
+      <div class="nav-section">
+        <div class="nav-title" data-i18n="nav.overview">Overview</div>
+        <button class="nav-btn active" onclick="showSection('dashboard', this)" data-i18n="nav.dashboard">Dashboard</button>
+        <button class="nav-btn" onclick="showSection('explorer', this)" data-i18n="nav.explorer">Memory Explorer</button>
+        <button class="nav-btn" onclick="showSection('inspector', this)" data-i18n="nav.inspector">Retrieval Inspector</button>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title" data-i18n="nav.operations">Operations</div>
+        <button class="nav-btn" onclick="showSection('migration', this)" data-i18n="nav.migration">Migration Studio</button>
+        <button class="nav-btn" onclick="showSection('models', this)" data-i18n="nav.models">Models</button>
+        <button class="nav-btn" onclick="showSection('skills', this)" data-i18n="nav.skills">Skills</button>
+        <button class="nav-btn" onclick="showSection('graph', this)" data-i18n="nav.graph">Graph</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <h1 data-i18n="header.title">OpenClaw Memory Console</h1>
+          <p data-i18n="header.subtitle">Manage memory, inspect retrieval, and evolve skills.</p>
+        </div>
+        <div class="toolbar">
+          <span class="badge" data-i18n="header.badge">V2 Prototype</span>
+          <select id="localeSwitcher" onchange="setLocale(this.value)" style="width:auto">
+            <option value="zh-CN">中文</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+      </div>
+
+      <section id="section-dashboard" class="section">
+        <div class="dashboard-grid">
+          <div class="panel panel-klein">
+            <div class="panel-header">
+              <div>
+                <div class="panel-eyebrow" data-i18n="dashboard.summaryEyebrow">Structured Memory</div>
+                <h2 data-i18n="dashboard.summaryTitle">Summary Dashboard</h2>
+                <p class="muted" data-i18n="dashboard.summaryDesc">Operational counts across the current structured memory system.</p>
+              </div>
+              <button class="btn secondary" onclick="loadSummary()" data-i18n="actions.refreshSummary">Refresh summary</button>
+            </div>
+            <div id="summaryCards" class="summary-grid"></div>
+          </div>
+
+          <div class="panel panel-klein">
+            <div class="panel-header">
+              <div>
+                <div class="panel-eyebrow" data-i18n="dashboard.semanticEyebrow">Semantic Memory</div>
+                <h2 data-i18n="dashboard.semanticTitle">Semantic Memory Lens</h2>
+                <p class="muted" data-i18n="dashboard.semanticDesc">Live memory-pro volume, retrieval mode, and recent recall-ready entries.</p>
+              </div>
+              <button class="btn secondary" onclick="loadSummary()" data-i18n="actions.refreshSemantic">Refresh semantic view</button>
+            </div>
+            <div id="semanticStatus" class="status-strip">Loading semantic memory…</div>
+            <div id="semanticSummaryCards" class="summary-grid"></div>
+          </div>
+        </div>
+
+        <div class="panel panel-klein">
+          <div class="panel-header">
+            <div>
+              <div class="panel-eyebrow" data-i18n="dashboard.semanticBreakdownEyebrow">Operational Breakdown</div>
+              <h2 data-i18n="dashboard.semanticBreakdownTitle">Scope, Category, and Recent Memory</h2>
+              <p class="muted" data-i18n="dashboard.semanticBreakdownDesc">The data ordinary operators care about first: where memories live, what they are, and the latest entries being recalled.</p>
+            </div>
+          </div>
+          <div class="split-grid" style="margin-top:14px">
+            <div>
+              <div class="list-caption" data-i18n="dashboard.scopeCaption">Scope distribution</div>
+              <div id="semanticScopeDetail" class="detail-box kv-box">Not loaded</div>
+            </div>
+            <div>
+              <div class="list-caption" data-i18n="dashboard.categoryCaption">Category distribution</div>
+              <div id="semanticCategoryDetail" class="detail-box kv-box">Not loaded</div>
+            </div>
+          </div>
+          <div class="split-grid" style="margin-top:14px">
+            <div>
+              <div class="list-caption" data-i18n="dashboard.recentCaption">Recent semantic memory</div>
+              <div id="semanticRecentList" class="list-box"></div>
+            </div>
+            <div>
+              <div class="list-caption" data-i18n="dashboard.recentDetailCaption">Selected memory detail</div>
+              <div id="semanticRecentDetail" class="detail-box semantic-recent-detail">Select a semantic memory</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel panel-klein">
+          <div class="panel-header">
+            <div>
+              <div class="panel-eyebrow" data-i18n="dashboard.reportEyebrow">Evaluation</div>
+              <h2 data-i18n="dashboard.reportTitle">Evaluation Report</h2>
+            </div>
+            <button class="btn secondary" onclick="loadReport()" data-i18n="actions.loadReport">Load report</button>
+          </div>
+          <div id="reportSummary" style="margin-top:12px"></div>
+          <div id="reportData" class="detail-box">Not loaded</div>
+        </div>
+      </section>
+
+      <section id="section-explorer" class="section hidden">
+        <div class="panel">
+          <h2 data-i18n="explorer.title">Memory Explorer</h2>
+          <div class="split-grid">
+            <div>
+              <label class="muted" data-i18n="explorer.layerLabel">Layer</label>
+              <select id="layerName">
+                <option>facts</option>
+                <option>preferences</option>
+                <option selected>episodes</option>
+                <option>tasks</option>
+                <option>skills</option>
+                <option>skill_proposals</option>
+                <option>sessions</option>
+                <option>models</option>
+                <option>migration_candidates</option>
+                <option>graph.nodes</option>
+                <option>graph.edges</option>
+              </select>
+              <button class="btn secondary" onclick="loadLayerList()" data-i18n="actions.loadLayer">Load layer</button>
+              <div id="layerList" class="list-box" style="margin-top:12px"></div>
+            </div>
+            <div>
+              <label class="muted" data-i18n="explorer.detailLabel">Details</label>
+              <div id="layerDetail" class="detail-box">Select a record</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-grid">
+          <div class="panel">
+            <h2 data-i18n="explorer.prefTitle">Create Preference</h2>
+            <p class="muted" data-i18n="explorer.prefDesc">Write stable collaboration preferences and user profile hints.</p>
+            <div class="form-grid">
+              <input id="prefKey" value="user.communication_style.direct" placeholder="preference key" />
+              <input id="prefValue" value="true" placeholder="value" />
+              <select id="prefValueType">
+                <option value="boolean" selected>boolean</option>
+                <option value="string">string</option>
+                <option value="number">number</option>
+              </select>
+              <textarea id="prefNotes">User prefers direct and efficient communication.</textarea>
+              <input id="prefStrength" value="0.95" placeholder="strength" />
+              <input id="prefAliases" value="direct,efficient" placeholder="aliases,comma,separated" />
+              <input id="prefTags" value="communication,style" placeholder="tags,comma,separated" />
+              <button class="btn" onclick="createPreference()" data-i18n="actions.createPreference">Create preference</button>
+            </div>
+            <div id="prefCreateResult" class="detail-box" style="margin-top:12px">Not created</div>
+          </div>
+
+          <div class="panel">
+            <h2 data-i18n="explorer.taskTitle">Create Task</h2>
+            <p class="muted" data-i18n="explorer.taskDesc">Capture the current working-memory task state as a structured record.</p>
+            <div class="form-grid">
+              <input id="taskId" value="task-console-beta" placeholder="task id" />
+              <input id="taskTitle" value="Stabilize memory console beta" placeholder="task title" />
+              <textarea id="taskSummary">Close backend and UI gaps so the local memory console can be used end-to-end.</textarea>
+              <input id="taskNextAction" value="Finish write-form coverage and validation." placeholder="next action" />
+              <select id="taskPriority">
+                <option value="high" selected>high</option>
+                <option value="medium">medium</option>
+                <option value="low">low</option>
+              </select>
+              <select id="taskState">
+                <option value="active" selected>active</option>
+                <option value="paused">paused</option>
+                <option value="done">done</option>
+              </select>
+              <select id="taskImportance">
+                <option value="high" selected>high</option>
+                <option value="critical">critical</option>
+                <option value="medium">medium</option>
+                <option value="low">low</option>
+              </select>
+              <input id="taskEntities" value="memory-console,beta,admin-http" placeholder="related entities,comma,separated" />
+              <button class="btn" onclick="createTask()" data-i18n="actions.createTask">Create task</button>
+            </div>
+            <div id="taskCreateResult" class="detail-box" style="margin-top:12px">Not created</div>
+          </div>
+
+          <div class="panel">
+            <h2 data-i18n="explorer.episodeTitle">Create Episode</h2>
+            <p class="muted" data-i18n="explorer.episodeDesc">Summarize a discussion, decision, or incident as a reusable memory episode.</p>
+            <div class="form-grid">
+              <input id="episodeId" value="ep-console-beta-progress" placeholder="episode id" />
+              <input id="episodeTitle" value="Memory console beta stabilization" placeholder="episode title" />
+              <textarea id="episodeSummary">Stabilized wrappers, exact search integration, validation, and admin console coverage.</textarea>
+              <select id="episodeStatus">
+                <option value="active" selected>active</option>
+                <option value="archived">archived</option>
+                <option value="superseded">superseded</option>
+              </select>
+              <input id="episodeTaskIds" value="task-console-beta" placeholder="task ids,comma,separated" />
+              <select id="episodeImportance">
+                <option value="high" selected>high</option>
+                <option value="critical">critical</option>
+                <option value="medium">medium</option>
+                <option value="low">low</option>
+              </select>
+              <button class="btn" onclick="createEpisode()" data-i18n="actions.createEpisode">Create episode</button>
+            </div>
+            <div id="episodeCreateResult" class="detail-box" style="margin-top:12px">Not created</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="section-inspector" class="section hidden">
+        <div class="panel">
+          <h2 data-i18n="inspector.title">Retrieval Inspector</h2>
+          <input id="inspectQuery" value="memory loss validation" />
+          <button class="btn secondary" onclick="inspectQuery()" data-i18n="actions.inspect">Inspect</button>
+          <div id="inspectSummary" style="margin-top:12px"></div>
+          <div id="inspectData" class="detail-box">Not loaded</div>
+        </div>
+      </section>
+
+      <section id="section-migration" class="section hidden">
+        <div class="content-grid">
+          <div class="panel">
+            <h2 data-i18n="migration.previewTitle">Migration Preview</h2>
+            <div class="form-grid">
+              <input id="sourceLayer" value="episodes" />
+              <input id="recordId" value="ep-memory-validation" />
+              <input id="targetLayer" value="tasks" />
+              <button class="btn secondary" onclick="migrationPreview()" data-i18n="actions.preview">Preview</button>
+            </div>
+            <div id="migrationData" class="detail-box" style="margin-top:12px">Not loaded</div>
+          </div>
+
+          <div class="panel">
+            <h2 data-i18n="migration.createTitle">Create Migration Candidate</h2>
+            <div class="form-grid">
+              <input id="candidateId" value="cand-web-001" />
+              <input id="candidateSourceLayer" value="episodes" />
+              <input id="candidateSourceId" value="ep-memory-validation" />
+              <input id="candidateTargetLayer" value="tasks" />
+              <input id="candidateTargetId" value="task-memory-validation" />
+              <textarea id="candidateSummary">Promote memory validation discussion into an explicit task record.</textarea>
+              <input id="candidateConfidence" value="0.8" />
+              <button class="btn" onclick="createMigrationCandidate()" data-i18n="actions.createCandidate">Create candidate</button>
+            </div>
+            <div id="candidateCreateResult" class="detail-box" style="margin-top:12px">Not created</div>
+          </div>
+
+          <div class="panel">
+            <h2 data-i18n="migration.candidatesTitle">Migration Candidates</h2>
+            <button class="btn secondary" onclick="loadSpecialPanel('migration_candidates', 'migrationCandidatesList', 'migrationCandidatesDetail')" data-i18n="actions.loadCandidates">Load candidates</button>
+            <div class="split-grid" style="margin-top:12px">
+              <div id="migrationCandidatesList" class="list-box"></div>
+              <div id="migrationCandidatesDetail" class="detail-box">Select a candidate</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="section-models" class="section hidden">
+        <div class="content-grid">
+          <div class="panel">
+            <h2 data-i18n="models.createTitle">Create Model Profile</h2>
+            <div class="form-grid">
+              <input id="modelCategory" value="embedding" />
+              <input id="modelName" value="default-embed" />
+              <input id="modelProvider" value="openai-compatible" />
+              <input id="modelModel" value="text-embedding-3-large" />
+              <input id="modelBaseUrl" value="" placeholder="base_url (optional)" />
+              <input id="modelApiKeyRef" value="" placeholder="api_key_ref (optional)" />
+              <textarea id="modelNotes">Default embedding profile for memory retrieval.</textarea>
+              <button class="btn" onclick="createModelProfile()" data-i18n="actions.createModelProfile">Create model profile</button>
+            </div>
+            <div id="modelCreateResult" class="detail-box" style="margin-top:12px">Not created</div>
+          </div>
+
+          <div class="panel">
+            <h2 data-i18n="models.listTitle">Model Profiles</h2>
+            <button class="btn secondary" onclick="loadSpecialPanel('models', 'modelsList', 'modelsDetail')" data-i18n="actions.loadModels">Load models</button>
+            <div class="split-grid" style="margin-top:12px">
+              <div id="modelsList" class="list-box"></div>
+              <div id="modelsDetail" class="detail-box">Select a model profile</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="section-skills" class="section hidden">
+        <div class="content-grid">
+          <div class="panel">
+            <h2 data-i18n="skills.createTitle">Create Skill</h2>
+            <div class="form-grid">
+              <input id="skillId" value="skill-memory-eval-web" />
+              <input id="skillTitle" value="Evaluate memory systems" />
+              <textarea id="skillSummary">Use multi-case recall tests to evaluate memory quality, continuity, and preference recall.</textarea>
+              <input id="skillInstalled" value="true" />
+              <input id="skillQualityScore" value="0.82" />
+              <input id="skillEvolutionStatus" value="active" />
+              <input id="skillProposedByModel" value="skill-evolver-v1" />
+              <button class="btn" onclick="createSkill()" data-i18n="actions.createSkill">Create skill</button>
+            </div>
+
+            <div id="skillCreateResult" class="detail-box" style="margin-top:12px">Not created</div>
+          </div>
+
+          <div class="panel">
+            <h2 data-i18n="skills.listTitle">Skills</h2>
+            <button class="btn secondary" onclick="loadSpecialPanel('skills', 'skillsList', 'skillsDetail')" data-i18n="actions.loadSkills">Load skills</button>
+            <div class="split-grid" style="margin-top:12px">
+              <div id="skillsList" class="list-box"></div>
+              <div id="skillsDetail" class="detail-box">Select a skill</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2 data-i18n="skills.proposalsTitle">Skill Proposals</h2>
+            <div class="form-grid">
+              <input id="proposalId" value="proposal-skill-memory-eval-v2" />
+              <input id="proposalSkillId" value="skill-memory-eval-web" />
+              <input id="proposalTitle" value="Refine memory evaluation skill" />
+              <textarea id="proposalSummary">Propose an improved version of the memory evaluation skill with better recall metrics and graph-assisted debugging steps.</textarea>
+              <input id="proposalStatus" value="pending" />
+              <input id="proposalModel" value="skill-evolver-v1" />
+              <input id="proposalSourceTasks" value="task-memory-console,task-memory-eval" />
+              <button class="btn" onclick="createSkillProposal()" data-i18n="actions.createSkillProposal">Create skill proposal</button>
+            </div>
+            <div id="proposalCreateResult" class="detail-box" style="margin-top:12px">Not created</div>
+            <button class="btn secondary" style="margin-top:12px" onclick="loadSpecialPanel('skill_proposals', 'skillProposalsList', 'skillProposalsDetail')" data-i18n="actions.loadProposals">Load proposals</button>
+            <div class="split-grid" style="margin-top:12px">
+              <div id="skillProposalsList" class="list-box"></div>
+              <div id="skillProposalsDetail" class="detail-box">Select a proposal</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="section-graph" class="section hidden">
+        <div class="panel panel-klein graph-console">
+          <div class="panel-header">
+            <div>
+              <h2 data-i18n="graph.title">Graph Browser</h2>
+              <p class="muted" data-i18n="graph.desc">Rebuild and inspect the structured-memory graph that powers graph-assisted retrieval.</p>
+            </div>
+            <div class="toolbar">
+              <button class="btn" onclick="refreshGraph()" data-i18n="actions.refreshGraph">Refresh graph</button>
+              <button class="btn secondary" onclick="loadGraph()" data-i18n="actions.loadGraph">Load graph</button>
+            </div>
+          </div>
+          <div id="graphRefreshStatus" class="status-strip">Graph has not been rebuilt in this session.</div>
+          <div class="graph-controls">
+            <label class="graph-control-field">
+              <span class="graph-control-label" data-i18n="graph.searchLabel">Search</span>
+              <input id="graphSearchInput" oninput="applyGraphFilters()" />
+            </label>
+            <label class="graph-control-field">
+              <span class="graph-control-label" data-i18n="graph.filterLabel">Node Type</span>
+              <select id="graphTypeFilter" onchange="applyGraphFilters()">
+                <option value="all">all</option>
+              </select>
+            </label>
+            <div class="graph-control-field">
+              <span class="graph-control-label" data-i18n="graph.legendLabel">Legend</span>
+              <div id="graphLegend" class="graph-legend"></div>
+            </div>
+          </div>
+          <div class="summary-grid graph-stat-grid">
+            <div class="metric"><div id="graphStatNodes" class="value">0</div><div class="label" data-i18n="graph.statNodes">Nodes</div></div>
+            <div class="metric"><div id="graphStatEdges" class="value">0</div><div class="label" data-i18n="graph.statEdges">Edges</div></div>
+            <div class="metric"><div id="graphStatVisibleNodes" class="value">0</div><div class="label" data-i18n="graph.statVisibleNodes">Visible Nodes</div></div>
+            <div class="metric"><div id="graphStatVisibleEdges" class="value">0</div><div class="label" data-i18n="graph.statVisibleEdges">Visible Edges</div></div>
+          </div>
+          <div class="graph-layout">
+            <div class="graph-stage-card">
+              <div class="graph-stage-toolbar">
+                <div class="graph-stage-copy">
+                  <div class="graph-stage-kicker" data-i18n="graph.stageCaption">Memory Relationship Map</div>
+                  <div class="graph-stage-title" data-i18n="graph.stageTitle">Layered Memory Map</div>
+                  <div class="graph-stage-subtitle" data-i18n="graph.stageSubtitle">Core memories stay on the left, semantic links move to the right, and every lane explains one kind of memory object.</div>
+                </div>
+                <div class="graph-stage-actions">
+                  <div id="graphViewportScale" class="graph-viewport-chip">100%</div>
+                  <div class="graph-zoom-controls">
+                    <button id="graphZoomOut" class="btn secondary graph-tool-btn" onclick="zoomGraphOut()" data-i18n="graph.zoomOut">Zoom out</button>
+                    <button id="graphZoomIn" class="btn secondary graph-tool-btn" onclick="zoomGraphIn()" data-i18n="graph.zoomIn">Zoom in</button>
+                    <button id="graphZoomFit" class="btn secondary graph-tool-btn" onclick="fitGraphViewport()" data-i18n="graph.zoomFit">Fit</button>
+                    <button id="graphZoomReset" class="btn secondary graph-tool-btn" onclick="resetGraphViewport()" data-i18n="graph.zoomReset">Reset</button>
+                  </div>
+                </div>
+              </div>
+              <div class="graph-canvas-shell">
+                <svg id="graphCanvas" viewBox="0 0 1000 640" role="img" aria-label="Memory graph">
+                  <g id="graphScene"></g>
+                </svg>
+              </div>
+              <div class="graph-mini-note" data-i18n="graph.stageNote">Use the wheel to zoom, drag the canvas to inspect dense areas, and read the graph from left-to-right: memory records, entities, tags, then aliases.</div>
+            </div>
+            <div class="graph-side-rail">
+              <div class="graph-side-panel">
+                <div class="list-caption" data-i18n="graph.summaryCaption">Relation Summary</div>
+                <div id="graphRelationSummary" class="detail-box kv-box graph-detail-box">Load graph to inspect relationship density.</div>
+              </div>
+              <div class="graph-side-panel">
+                <div class="split-grid graph-inspector-grid">
+                  <div>
+                    <div class="list-caption" data-i18n="graph.visibleNodesCaption">Visible Nodes</div>
+                    <div id="graphNodeList" class="list-box"></div>
+                  </div>
+                  <div>
+                    <div class="list-caption" data-i18n="graph.nodeDetail">Node Details</div>
+                    <div id="graphNodeDetail" class="detail-box graph-detail-box">Select a node</div>
+                  </div>
+                  <div>
+                    <div class="list-caption" data-i18n="graph.visibleEdgesCaption">Visible Edges</div>
+                    <div id="graphEdgeList" class="list-box"></div>
+                  </div>
+                  <div>
+                    <div class="list-caption" data-i18n="graph.edgeDetail">Edge Details</div>
+                    <div id="graphEdgeDetail" class="detail-box graph-detail-box">Select an edge</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const API_BASE = (window.API_BASE || 'http://127.0.0.1:8765').replace(/\/+$/, '');
+    const I18N = {
+      'zh-CN': {
+        'sidebar.subtitle': '商用级记忆管理控制台原型',
+        'nav.overview': '总览', 'nav.dashboard': '仪表盘', 'nav.explorer': '记忆浏览', 'nav.inspector': '检索诊断',
+        'nav.operations': '管理', 'nav.migration': '迁移工作台', 'nav.models': '模型配置', 'nav.skills': '技能中心', 'nav.graph': '记忆图谱',
+        'header.title': 'OpenClaw Memory Console', 'header.subtitle': '管理记忆、诊断召回、推进技能演化。', 'header.badge': 'V2 原型',
+        'dashboard.summaryEyebrow': '结构化记忆',
+        'dashboard.summaryTitle': '总览仪表盘',
+        'dashboard.summaryDesc': '当前结构化记忆层的运行统计，适合快速确认 facts、tasks、episodes 等是否正常沉淀。',
+        'dashboard.semanticEyebrow': '语义记忆',
+        'dashboard.semanticTitle': 'Semantic Memory Lens',
+        'dashboard.semanticDesc': '直接查看 memory-pro 的总量、检索模式和最近写入的语义记忆。',
+        'dashboard.semanticBreakdownEyebrow': '运行分布',
+        'dashboard.semanticBreakdownTitle': 'Scope、Category 与最近记忆',
+        'dashboard.semanticBreakdownDesc': '先看分布，再看最近记录，符合普通运维和产品同学的日常巡检习惯。',
+        'dashboard.scopeCaption': 'Scope 分布',
+        'dashboard.categoryCaption': 'Category 分布',
+        'dashboard.recentCaption': '最近语义记忆',
+        'dashboard.recentDetailCaption': '选中记录详情',
+        'dashboard.reportEyebrow': '评测',
+        'dashboard.reportTitle': '评测报告',
+        'explorer.title': '记忆浏览器', 'explorer.layerLabel': '层', 'explorer.detailLabel': '详情',
+        'explorer.prefTitle': '创建偏好', 'explorer.prefDesc': '录入稳定的协作偏好和用户画像提示。',
+        'explorer.taskTitle': '创建任务', 'explorer.taskDesc': '把当前工作记忆中的任务状态结构化保存下来。',
+        'explorer.episodeTitle': '创建事件摘要', 'explorer.episodeDesc': '把讨论、结论或故障过程沉淀成 episode 记录。',
+        'inspector.title': '检索诊断', 'migration.previewTitle': '迁移预览', 'migration.createTitle': '创建迁移候选', 'migration.candidatesTitle': '迁移候选',
+        'models.createTitle': '创建模型配置', 'models.listTitle': '模型配置列表',
+        'skills.createTitle': '创建技能', 'skills.listTitle': '技能列表', 'skills.proposalsTitle': '技能提案',
+        'graph.title': '图谱浏览器', 'graph.desc': '手动重建并检查结构化记忆图谱，确认节点与关系是否已经沉淀。', 'graph.searchLabel': '搜索', 'graph.filterLabel': '节点类型', 'graph.legendLabel': '图例', 'graph.stageCaption': '记忆关联图', 'graph.stageTitle': '分层记忆地图', 'graph.stageSubtitle': '左侧是核心记忆，右侧是语义实体、标签和别名，每一列都代表一种记忆对象。', 'graph.stageNote': '可用滚轮缩放、拖动画布查看密集区域，并按从左到右的顺序阅读：记忆记录、实体、标签、别名。', 'graph.zoomOut': '缩小', 'graph.zoomIn': '放大', 'graph.zoomFit': '适配', 'graph.zoomReset': '复位', 'graph.summaryCaption': '关系摘要', 'graph.visibleNodesCaption': '当前可见节点', 'graph.visibleEdgesCaption': '当前可见关系', 'graph.statNodes': '总节点', 'graph.statEdges': '总关系', 'graph.statVisibleNodes': '当前节点', 'graph.statVisibleEdges': '当前关系', 'graph.nodes': '节点', 'graph.nodeDetail': '节点详情', 'graph.edges': '边', 'graph.edgeDetail': '边详情',
+        'actions.refreshSummary': '刷新总览', 'actions.loadReport': '加载报告', 'actions.loadLayer': '加载层', 'actions.inspect': '诊断',
+        'actions.refreshSemantic': '刷新语义视图',
+        'actions.preview': '预览', 'actions.createCandidate': '创建迁移候选', 'actions.loadCandidates': '加载候选',
+        'actions.createModelProfile': '创建模型配置', 'actions.loadModels': '加载模型', 'actions.createSkill': '创建技能', 'actions.loadSkills': '加载技能',
+        'actions.createPreference': '创建偏好', 'actions.createTask': '创建任务', 'actions.createEpisode': '创建事件摘要',
+        'actions.createSkillProposal': '创建技能提案', 'actions.loadProposals': '加载提案', 'actions.loadGraph': '加载图谱', 'actions.refreshGraph': '重建图谱'
+      },
+      'en': {
+        'sidebar.subtitle': 'Commercial-grade memory management console prototype',
+        'nav.overview': 'Overview', 'nav.dashboard': 'Dashboard', 'nav.explorer': 'Memory Explorer', 'nav.inspector': 'Retrieval Inspector',
+        'nav.operations': 'Operations', 'nav.migration': 'Migration Studio', 'nav.models': 'Models', 'nav.skills': 'Skills', 'nav.graph': 'Graph',
+        'header.title': 'OpenClaw Memory Console', 'header.subtitle': 'Manage memory, inspect retrieval, and evolve skills.', 'header.badge': 'V2 Prototype',
+        'dashboard.summaryEyebrow': 'Structured Memory',
+        'dashboard.summaryTitle': 'Summary Dashboard',
+        'dashboard.summaryDesc': 'Operational counts across the structured memory layers that ordinary operators inspect first.',
+        'dashboard.semanticEyebrow': 'Semantic Memory',
+        'dashboard.semanticTitle': 'Semantic Memory Lens',
+        'dashboard.semanticDesc': 'Live memory-pro volume, retrieval mode, and recent recall-ready entries.',
+        'dashboard.semanticBreakdownEyebrow': 'Operational Breakdown',
+        'dashboard.semanticBreakdownTitle': 'Scope, Category, and Recent Memory',
+        'dashboard.semanticBreakdownDesc': 'A practical overview for everyday operators: where memories live, what they are, and what landed most recently.',
+        'dashboard.scopeCaption': 'Scope distribution',
+        'dashboard.categoryCaption': 'Category distribution',
+        'dashboard.recentCaption': 'Recent semantic memory',
+        'dashboard.recentDetailCaption': 'Selected memory detail',
+        'dashboard.reportEyebrow': 'Evaluation',
+        'dashboard.reportTitle': 'Evaluation Report',
+        'explorer.title': 'Memory Explorer', 'explorer.layerLabel': 'Layer', 'explorer.detailLabel': 'Details',
+        'explorer.prefTitle': 'Create Preference', 'explorer.prefDesc': 'Write stable collaboration preferences and user profile hints.',
+        'explorer.taskTitle': 'Create Task', 'explorer.taskDesc': 'Capture the current working-memory task state as a structured record.',
+        'explorer.episodeTitle': 'Create Episode', 'explorer.episodeDesc': 'Summarize a discussion, decision, or incident as a reusable episode.',
+        'inspector.title': 'Retrieval Inspector', 'migration.previewTitle': 'Migration Preview', 'migration.createTitle': 'Create Migration Candidate', 'migration.candidatesTitle': 'Migration Candidates',
+        'models.createTitle': 'Create Model Profile', 'models.listTitle': 'Model Profiles',
+        'skills.createTitle': 'Create Skill', 'skills.listTitle': 'Skills', 'skills.proposalsTitle': 'Skill Proposals',
+        'graph.title': 'Graph Browser', 'graph.desc': 'Rebuild and inspect the structured-memory graph that supports graph-assisted retrieval.', 'graph.searchLabel': 'Search', 'graph.filterLabel': 'Node Type', 'graph.legendLabel': 'Legend', 'graph.stageCaption': 'Memory Relationship Map', 'graph.stageTitle': 'Layered Memory Map', 'graph.stageSubtitle': 'Core memories stay on the left, semantic entities and tags move to the right, and each lane explains one memory object type.', 'graph.stageNote': 'Use the wheel to zoom, drag the canvas to inspect dense areas, and read the graph from left to right: memory records, entities, tags, then aliases.', 'graph.zoomOut': 'Zoom out', 'graph.zoomIn': 'Zoom in', 'graph.zoomFit': 'Fit', 'graph.zoomReset': 'Reset', 'graph.summaryCaption': 'Relation Summary', 'graph.visibleNodesCaption': 'Visible Nodes', 'graph.visibleEdgesCaption': 'Visible Edges', 'graph.statNodes': 'Nodes', 'graph.statEdges': 'Edges', 'graph.statVisibleNodes': 'Visible Nodes', 'graph.statVisibleEdges': 'Visible Edges', 'graph.nodes': 'Nodes', 'graph.nodeDetail': 'Node Details', 'graph.edges': 'Edges', 'graph.edgeDetail': 'Edge Details',
+        'actions.refreshSummary': 'Refresh summary', 'actions.loadReport': 'Load report', 'actions.loadLayer': 'Load layer', 'actions.inspect': 'Inspect',
+        'actions.refreshSemantic': 'Refresh semantic view',
+        'actions.preview': 'Preview', 'actions.createCandidate': 'Create candidate', 'actions.loadCandidates': 'Load candidates',
+        'actions.createModelProfile': 'Create model profile', 'actions.loadModels': 'Load models', 'actions.createSkill': 'Create skill', 'actions.loadSkills': 'Load skills',
+        'actions.createPreference': 'Create preference', 'actions.createTask': 'Create task', 'actions.createEpisode': 'Create episode',
+        'actions.createSkillProposal': 'Create skill proposal', 'actions.loadProposals': 'Load proposals', 'actions.loadGraph': 'Load graph', 'actions.refreshGraph': 'Refresh graph'
+      }
+    };
+
+    let locale = localStorage.getItem('memory-console-locale') || 'zh-CN';
+    const graphState = {
+      rawNodes: {},
+      rawEdges: [],
+      viewModel: null,
+      selectedNodeId: null,
+      viewport: {
+        scale: 1,
+        translateX: 0,
+        translateY: 0,
+      },
+      pointer: {
+        active: false,
+        pointerId: null,
+        startX: 0,
+        startY: 0,
+        originX: 0,
+        originY: 0,
+        didDrag: false,
+      },
+      preserveViewportOnNextFilter: false,
+      suppressNextGraphClick: false,
+    };
+
+    function t(key) {
+      return (I18N[locale] && I18N[locale][key]) || I18N['en'][key] || key;
+    }
+
+    function applyI18n() {
+      document.documentElement.lang = locale;
+      document.getElementById('localeSwitcher').value = locale;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        el.textContent = t(el.getAttribute('data-i18n'));
+      });
+      const graphSearchInput = document.getElementById('graphSearchInput');
+      if (graphSearchInput) {
+        graphSearchInput.placeholder = locale === 'zh-CN' ? '搜索节点、标签、关系词…' : 'Search nodes, tags, relations…';
+      }
+      if (typeof updateGraphViewportHud === 'function') updateGraphViewportHud();
+    }
+
+    function setLocale(next) {
+      locale = next;
+      localStorage.setItem('memory-console-locale', next);
+      applyI18n();
+    }
+
+    function showSection(name, btn) {
+      document.querySelectorAll('.section').forEach(el => el.classList.add('hidden'));
+      document.getElementById('section-' + name).classList.remove('hidden');
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+
+    function buildApiUrl(path) {
+      const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+      if (API_BASE.endsWith('/api') && normalizedPath === '/api') {
+        return API_BASE;
+      }
+      if (API_BASE.endsWith('/api') && normalizedPath.startsWith('/api/')) {
+        return API_BASE + normalizedPath.slice(4);
+      }
+      return API_BASE + normalizedPath;
+    }
+
+    async function getJson(path) {
+      const res = await fetch(buildApiUrl(path));
+      return await res.json();
+    }
+
+    async function postJson(path, body) {
+      const res = await fetch(buildApiUrl(path), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      return await res.json();
+    }
+
+    function formatMetricLabel(key) {
+      return String(key || '')
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+    }
+
+    function renderMetricCards(containerId, data) {
+      const el = document.getElementById(containerId);
+      el.innerHTML = '';
+      Object.entries(data || {}).forEach(([key, value]) => {
+        const card = document.createElement('div');
+        card.className = 'metric';
+        card.innerHTML = `<div class="value">${value}</div><div class="label">${formatMetricLabel(key)}</div>`;
+        el.appendChild(card);
+      });
+    }
+
+    function renderSummaryCards(data) {
+      renderMetricCards('summaryCards', data);
+    }
+
+    function renderKeyValueBox(containerId, data, emptyText) {
+      const el = document.getElementById(containerId);
+      const entries = Object.entries(data || {});
+      if (!entries.length) {
+        el.textContent = emptyText;
+        return;
+      }
+      el.innerHTML = entries.map(([key, value]) => (
+        `<div class="kv-row"><div class="kv-key">${key}</div><div class="kv-value">${value}</div></div>`
+      )).join('');
+    }
+
+    function normalizeSemanticDetail(item) {
+      if (!item || typeof item !== 'object') return item;
+      return {
+        id: item.id,
+        text: item.text,
+        scope: item.scope,
+        category: item.category,
+        importance: item.importance,
+        timestamp: item.timestamp,
+        metadata: item.metadata,
+      };
+    }
+
+    function renderSemanticOverview(payload) {
+      const statusEl = document.getElementById('semanticStatus');
+      const detailEl = document.getElementById('semanticRecentDetail');
+
+      if (!payload || payload.ok === false) {
+        statusEl.textContent = (payload && payload.error && payload.error.message) || 'Semantic memory unavailable';
+        renderMetricCards('semanticSummaryCards', {});
+        renderKeyValueBox('semanticScopeDetail', {}, 'No scope data');
+        renderKeyValueBox('semanticCategoryDetail', {}, 'No category data');
+        renderSelectableList('semanticRecentList', [], () => {}, 'No semantic memory');
+        detailEl.textContent = 'Semantic memory unavailable';
+        return;
+      }
+
+      const data = payload.data || {};
+      if (!data.configured) {
+        statusEl.textContent = 'Semantic memory provider not configured yet.';
+        renderMetricCards('semanticSummaryCards', {
+          provider: '-',
+          total_count: 0,
+          retrieval_mode: '-',
+          recent_rows: 0,
+        });
+        renderKeyValueBox('semanticScopeDetail', {}, 'No scope data');
+        renderKeyValueBox('semanticCategoryDetail', {}, 'No category data');
+        renderSelectableList('semanticRecentList', [], () => {}, 'No semantic memory');
+        detailEl.textContent = 'No semantic memory provider configured';
+        return;
+      }
+
+      const retrieval = data.retrieval || {};
+      const recent = Array.isArray(data.recent) ? data.recent : [];
+      statusEl.textContent = `${data.provider || 'semantic-memory'} online · ${data.total_count || 0} records available for recall`;
+      renderMetricCards('semanticSummaryCards', {
+        provider: data.provider || '-',
+        total_count: data.total_count || 0,
+        retrieval_mode: retrieval.mode || '-',
+        scope_kinds: Object.keys(data.scope_counts || {}).length,
+        category_kinds: Object.keys(data.category_counts || {}).length,
+        recent_rows: recent.length,
+      });
+      renderKeyValueBox('semanticScopeDetail', data.scope_counts || {}, 'No scope data');
+      renderKeyValueBox('semanticCategoryDetail', data.category_counts || {}, 'No category data');
+
+      const entries = recent.map((item, index) => ({
+        key: `${index + 1}. ${(item.scope || 'unknown').toString()} · ${(item.category || 'uncategorized').toString()} · ${String(item.text || '').slice(0, 56)}`,
+        value: normalizeSemanticDetail(item),
+      }));
+      renderSelectableList('semanticRecentList', entries, (value) => {
+        detailEl.textContent = JSON.stringify(value, null, 2);
+      }, 'No semantic memory');
+      detailEl.textContent = recent.length ? JSON.stringify(normalizeSemanticDetail(recent[0]), null, 2) : 'No semantic memory';
+    }
+
+    async function loadSummary() {
+      const summaryPromise = getJson('/api/summary').then((summaryPayload) => {
+        renderSummaryCards(summaryPayload.data || {});
+        return summaryPayload;
+      });
+      const semanticPromise = getJson('/api/semantic-overview').catch((error) => ({
+          ok: false,
+          error: { message: String(error) },
+        })).then((semanticPayload) => {
+          renderSemanticOverview(semanticPayload);
+          return semanticPayload;
+        });
+      await Promise.all([summaryPromise, semanticPromise]);
+    }
+
+    function renderSelectableList(containerId, entries, onSelect, emptyText) {
+      const el = document.getElementById(containerId);
+      el.innerHTML = '';
+      if (!entries.length) {
+        el.textContent = emptyText;
+        return;
+      }
+      entries.forEach(({ key, value }) => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.textContent = key;
+        item.onclick = () => onSelect(value);
+        el.appendChild(item);
+      });
+    }
+
+    function renderLayerList(payload) {
+      const data = payload.data || {};
+      const entries = Array.isArray(data)
+        ? data.map((item, idx) => [String(idx), item])
+        : Object.entries(data);
+      renderSelectableList('layerList', entries.map(([key, value]) => ({ key, value })), (value) => {
+        document.getElementById('layerDetail').textContent = JSON.stringify(value, null, 2);
+      }, 'No records');
+    }
+
+    async function loadLayerList() {
+      const layer = document.getElementById('layerName').value;
+      const payload = await getJson('/api/layer?layer=' + encodeURIComponent(layer));
+      renderLayerList(payload);
+      document.getElementById('layerDetail').textContent = 'Select a record';
+    }
+
+    async function loadSpecialPanel(layer, listId, detailId) {
+      const payload = await getJson('/api/layer?layer=' + encodeURIComponent(layer));
+      const data = payload.data || {};
+      const entries = Array.isArray(data)
+        ? data.map((item, idx) => [String(idx), item])
+        : Object.entries(data);
+      renderSelectableList(listId, entries.map(([key, value]) => ({ key, value })), (value) => {
+        document.getElementById(detailId).textContent = JSON.stringify(value, null, 2);
+      }, 'No records');
+      document.getElementById(detailId).textContent = 'Select a record';
+    }
+
+    async function inspectQuery() {
+      const q = document.getElementById('inspectQuery').value;
+      const payload = await getJson('/api/inspect?q=' + encodeURIComponent(q));
+      const data = payload.data || {};
+      document.getElementById('inspectSummary').innerHTML = `<p><strong>Route:</strong> ${data.route || '-'} · <strong>Graph expansions:</strong> ${data.graph_expansion_count || 0}</p>`;
+      document.getElementById('inspectData').textContent = JSON.stringify(payload, null, 2);
+    }
+
+    async function migrationPreview() {
+      const sourceLayer = document.getElementById('sourceLayer').value;
+      const recordId = document.getElementById('recordId').value;
+      const targetLayer = document.getElementById('targetLayer').value;
+      const qs = new URLSearchParams({ source_layer: sourceLayer, id: recordId, target_layer: targetLayer });
+      document.getElementById('migrationData').textContent = JSON.stringify(await getJson('/api/migration-preview?' + qs.toString()), null, 2);
+    }
+
+    async function createMigrationCandidate() {
+      const payload = await postJson('/api/migration-candidate', {
+        candidate_id: document.getElementById('candidateId').value,
+        source_layer: document.getElementById('candidateSourceLayer').value,
+        source_id: document.getElementById('candidateSourceId').value,
+        target_layer: document.getElementById('candidateTargetLayer').value,
+        target_id: document.getElementById('candidateTargetId').value,
+        summary: document.getElementById('candidateSummary').value,
+        confidence: parseFloat(document.getElementById('candidateConfidence').value || '0.5'),
+      });
+      document.getElementById('candidateCreateResult').textContent = JSON.stringify(payload, null, 2);
+      await loadSpecialPanel('migration_candidates', 'migrationCandidatesList', 'migrationCandidatesDetail');
+      await loadSummary();
+    }
+
+    async function createModelProfile() {
+      const payload = await postJson('/api/model-profile', {
+        category: document.getElementById('modelCategory').value,
+        name: document.getElementById('modelName').value,
+        provider: document.getElementById('modelProvider').value,
+        model: document.getElementById('modelModel').value,
+        base_url: document.getElementById('modelBaseUrl').value || null,
+        api_key_ref: document.getElementById('modelApiKeyRef').value || null,
+        notes: document.getElementById('modelNotes').value || null,
+      });
+      document.getElementById('modelCreateResult').textContent = JSON.stringify(payload, null, 2);
+      await loadSpecialPanel('models', 'modelsList', 'modelsDetail');
+      await loadSummary();
+    }
+
+    async function createSkill() {
+      const payload = await postJson('/api/skill', {
+        skill_id: document.getElementById('skillId').value,
+        title: document.getElementById('skillTitle').value,
+        summary: document.getElementById('skillSummary').value,
+        installed: String(document.getElementById('skillInstalled').value).toLowerCase() === 'true',
+        quality_score: parseFloat(document.getElementById('skillQualityScore').value || '0'),
+        evolution_status: document.getElementById('skillEvolutionStatus').value,
+        proposed_by_model: document.getElementById('skillProposedByModel').value || null,
+      });
+      document.getElementById('skillCreateResult').textContent = JSON.stringify(payload, null, 2);
+      await loadSpecialPanel('skills', 'skillsList', 'skillsDetail');
+      await loadSummary();
+    }
+
+    async function createPreference() {
+      const aliases = document.getElementById('prefAliases').value.split(',').map(s => s.trim()).filter(Boolean);
+      const tags = document.getElementById('prefTags').value.split(',').map(s => s.trim()).filter(Boolean);
+      const rawValue = document.getElementById('prefValue').value;
+      const valueType = document.getElementById('prefValueType').value;
+      let parsedValue = rawValue;
+      if (valueType === 'boolean') {
+        parsedValue = String(rawValue).toLowerCase() === 'true';
+      } else if (valueType === 'number') {
+        const numericText = String(rawValue).trim();
+        if (numericText) {
+          const numericValue = Number(numericText);
+          if (Number.isFinite(numericValue)) parsedValue = numericValue;
+        }
+      }
+      const payload = await postJson('/api/preference', {
+        key: document.getElementById('prefKey').value,
+        value: parsedValue,
+        value_type: valueType,
+        notes: document.getElementById('prefNotes').value,
+        strength: parseFloat(document.getElementById('prefStrength').value || '0.5'),
+        aliases,
+        tags,
+      });
+      document.getElementById('prefCreateResult').textContent = JSON.stringify(payload, null, 2);
+      await loadSummary();
+      if (document.getElementById('layerName').value === 'preferences') await loadLayerList();
+    }
+
+    async function createTask() {
+      const related_entities = document.getElementById('taskEntities').value.split(',').map(s => s.trim()).filter(Boolean);
+      const payload = await postJson('/api/task', {
+        task_id: document.getElementById('taskId').value,
+        title: document.getElementById('taskTitle').value,
+        summary: document.getElementById('taskSummary').value,
+        next_action: document.getElementById('taskNextAction').value,
+        priority: document.getElementById('taskPriority').value,
+        state: document.getElementById('taskState').value,
+        importance: document.getElementById('taskImportance').value,
+        related_entities,
+      });
+      document.getElementById('taskCreateResult').textContent = JSON.stringify(payload, null, 2);
+      await loadSummary();
+      if (document.getElementById('layerName').value === 'tasks') await loadLayerList();
+    }
+
+    async function createEpisode() {
+      const task_ids = document.getElementById('episodeTaskIds').value.split(',').map(s => s.trim()).filter(Boolean);
+      const payload = await postJson('/api/episode', {
+        episode_id: document.getElementById('episodeId').value,
+        title: document.getElementById('episodeTitle').value,
+        summary: document.getElementById('episodeSummary').value,
+        status: document.getElementById('episodeStatus').value,
+        task_ids,
+        importance: document.getElementById('episodeImportance').value,
+      });
+      document.getElementById('episodeCreateResult').textContent = JSON.stringify(payload, null, 2);
+      await loadSummary();
+      if (document.getElementById('layerName').value === 'episodes') await loadLayerList();
+    }
+
+    async function createSkillProposal() {
+      const source_task_ids = document.getElementById('proposalSourceTasks').value.split(',').map(s => s.trim()).filter(Boolean);
+      const payload = await postJson('/api/skill-proposal', {
+        proposal_id: document.getElementById('proposalId').value,
+        skill_id: document.getElementById('proposalSkillId').value || null,
+        title: document.getElementById('proposalTitle').value,
+        summary: document.getElementById('proposalSummary').value,
+        status: document.getElementById('proposalStatus').value,
+        proposed_by_model: document.getElementById('proposalModel').value || null,
+        source_task_ids,
+      });
+      document.getElementById('proposalCreateResult').textContent = JSON.stringify(payload, null, 2);
+      await loadSummary();
+      await loadSpecialPanel('skill_proposals', 'skillProposalsList', 'skillProposalsDetail');
+      if (document.getElementById('layerName').value === 'skill_proposals') await loadLayerList();
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function buildGraphViewModel(nodesMap, edgesList, options = {}) {
+      const palette = {
+        fact: '#002fa7',
+        preference: '#2b63d9',
+        task: '#0f8a62',
+        episode: '#c77d0a',
+        session: '#355fa8',
+        entity: '#d46a1f',
+        tag: '#0e91a0',
+        alias: '#7b89a8',
+        default: '#51668e',
+      };
+      const typePriority = {
+        fact: 0,
+        preference: 1,
+        task: 2,
+        episode: 3,
+        session: 4,
+        entity: 5,
+        tag: 6,
+        alias: 7,
+        default: 8,
+      };
+      const search = String(options.search || '').trim().toLowerCase();
+      const nodeTypeFilter = options.nodeType && options.nodeType !== 'all' ? String(options.nodeType) : '';
+      const inputEdges = Array.isArray(edgesList) ? edgesList : [];
+      const adjacency = {};
+      const degreeMap = {};
+
+      inputEdges.forEach((edge) => {
+        if (!edge || !edge.source || !edge.target) return;
+        adjacency[edge.source] = adjacency[edge.source] || new Set();
+        adjacency[edge.target] = adjacency[edge.target] || new Set();
+        adjacency[edge.source].add(edge.target);
+        adjacency[edge.target].add(edge.source);
+        degreeMap[edge.source] = (degreeMap[edge.source] || 0) + 1;
+        degreeMap[edge.target] = (degreeMap[edge.target] || 0) + 1;
+      });
+
+      const nodes = Object.entries(nodesMap || {}).map(([id, record]) => {
+        const nodeRecord = record || {};
+        return {
+          id,
+          label: nodeRecord.label || id,
+          nodeType: nodeRecord.node_type || 'default',
+          layer: nodeRecord.layer || 'graph',
+          summary: nodeRecord.summary || nodeRecord.notes || '',
+          tags: Array.isArray(nodeRecord.tags) ? nodeRecord.tags : [],
+          aliases: Array.isArray(nodeRecord.aliases) ? nodeRecord.aliases : [],
+          degree: degreeMap[id] || 0,
+          record: nodeRecord.record || nodeRecord,
+        };
+      }).sort((a, b) => a.id.localeCompare(b.id));
+
+      const nodeTypes = Array.from(new Set(nodes.map((node) => node.nodeType))).sort((a, b) => {
+        return (typePriority[a] ?? 99) - (typePriority[b] ?? 99) || a.localeCompare(b);
+      });
+
+      const matchesNode = (node) => {
+        if (nodeTypeFilter && node.nodeType !== nodeTypeFilter) return false;
+        if (!search) return true;
+        const haystack = JSON.stringify({
+          id: node.id,
+          label: node.label,
+          nodeType: node.nodeType,
+          summary: node.summary,
+          tags: node.tags,
+          aliases: node.aliases,
+          record: node.record,
+        }).toLowerCase();
+        return haystack.includes(search);
+      };
+
+      const primaryIds = new Set(nodes.filter(matchesNode).map((node) => node.id));
+      const visibleIds = new Set();
+      if (!search && !nodeTypeFilter) {
+        nodes.forEach((node) => visibleIds.add(node.id));
+      } else {
+        primaryIds.forEach((id) => {
+          visibleIds.add(id);
+          (adjacency[id] || new Set()).forEach((neighborId) => visibleIds.add(neighborId));
+        });
+      }
+
+      const groupedNodes = {};
+      nodes.forEach((node) => {
+        groupedNodes[node.nodeType] = groupedNodes[node.nodeType] || [];
+        groupedNodes[node.nodeType].push(node);
+      });
+      Object.values(groupedNodes).forEach((group) => {
+        group.sort((a, b) => b.degree - a.degree || a.label.localeCompare(b.label) || a.id.localeCompare(b.id));
+      });
+
+      const laneCount = Math.max(nodeTypes.length, 1);
+      const laneSpacing = 210;
+      const width = Math.max(1180, 340 + Math.max(laneCount - 1, 0) * laneSpacing + 300);
+      const maxLaneSize = Math.max(1, ...nodeTypes.map((type) => (groupedNodes[type] || []).length));
+      const rowSpacing = 84;
+      const height = Math.max(760, 220 + Math.max(maxLaneSize - 1, 0) * rowSpacing + 220);
+      const leftPadding = 170;
+      const rightPadding = 170;
+      const topPadding = 150;
+      const usableWidth = Math.max(width - leftPadding - rightPadding, 1);
+      const laneNameMap = {
+        fact: 'facts',
+        preference: 'prefs',
+        task: 'tasks',
+        episode: 'episodes',
+        session: 'sessions',
+        entity: 'entities',
+        tag: 'tags',
+        alias: 'aliases',
+        default: 'other',
+      };
+      const laneByType = {};
+      const lanes = nodeTypes.map((type, laneIndex) => {
+        const laneX = laneCount === 1
+          ? width / 2
+          : leftPadding + (usableWidth / Math.max(laneCount - 1, 1)) * laneIndex;
+        const lane = {
+          nodeType: type,
+          displayLabel: laneNameMap[type] || type,
+          x: laneX,
+          index: laneIndex,
+          count: (groupedNodes[type] || []).length,
+          visibleCount: 0,
+          color: palette[type] || palette.default,
+        };
+        laneByType[type] = lane;
+        return lane;
+      });
+
+      nodeTypes.forEach((type) => {
+        const lane = laneByType[type];
+        (groupedNodes[type] || []).forEach((node, index) => {
+          const rawLabel = String(node.label || node.id);
+          const cardWidth = Math.max(160, Math.min(196, 126 + rawLabel.slice(0, 28).length * 4));
+          const cardHeight = node.nodeType === 'alias' ? 52 : 58;
+          node.x = lane ? lane.x : width / 2;
+          node.y = topPadding + index * rowSpacing;
+          node.boundsWidth = cardWidth;
+          node.boundsHeight = cardHeight;
+          node.laneIndex = lane ? lane.index : 0;
+        });
+      });
+
+      nodes.forEach((node) => {
+        node.visible = visibleIds.has(node.id);
+        node.primary = (!search && !nodeTypeFilter) || primaryIds.has(node.id);
+        node.color = palette[node.nodeType] || palette.default;
+        node.shortLabel = String(node.label || node.id).slice(0, 26);
+        node.radius = Math.max(18, Math.ceil((node.boundsHeight || 52) / 2));
+        if (node.visible && laneByType[node.nodeType]) {
+          laneByType[node.nodeType].visibleCount += 1;
+        }
+      });
+
+      const edges = inputEdges.map((edge, index) => ({
+        id: `edge-${index}`,
+        source: edge.source,
+        relation: edge.relation || 'related_to',
+        target: edge.target,
+        attrs: edge.attrs || {},
+        visible: visibleIds.has(edge.source) && visibleIds.has(edge.target),
+      }));
+
+      const visibleEdges = edges.filter((edge) => edge.visible);
+      const relationCounts = {};
+      visibleEdges.forEach((edge) => {
+        relationCounts[edge.relation] = (relationCounts[edge.relation] || 0) + 1;
+      });
+
+      const preferredVisibleNodes = nodes.filter((node) => node.visible).slice().sort((a, b) => {
+        const score = (node) => {
+          const typeWeight = {
+            fact: 8,
+            preference: 7,
+            task: 6,
+            episode: 5,
+            session: 4,
+            entity: 3,
+            tag: 2,
+            alias: 1,
+          };
+          return ((typeWeight[node.nodeType] || 0) * 1000) + (node.degree * 10);
+        };
+        return score(b) - score(a) || a.id.localeCompare(b.id);
+      });
+
+      let selectedNodeId = options.selectedNodeId || null;
+      if (!(selectedNodeId && visibleIds.has(selectedNodeId))) {
+        selectedNodeId = preferredVisibleNodes.find((node) => node.primary)?.id
+          || preferredVisibleNodes[0]?.id
+          || null;
+      }
+
+      return {
+        width,
+        height,
+        nodes,
+        edges,
+        nodeTypes,
+        lanes,
+        relationCounts,
+        selectedNodeId,
+        stats: {
+          totalNodes: nodes.length,
+          totalEdges: edges.length,
+          visibleNodes: nodes.filter((node) => node.visible).length,
+          visibleEdges: visibleEdges.length,
+        },
+      };
+    }
+
+    function createDefaultGraphViewport() {
+      return {
+        scale: 1,
+        translateX: 0,
+        translateY: 0,
+      };
+    }
+
+    function updateGraphViewportHud() {
+      const hud = document.getElementById('graphViewportScale');
+      if (!hud) return;
+      const viewport = graphState.viewport || createDefaultGraphViewport();
+      const percent = Math.round((viewport.scale || 1) * 100);
+      hud.textContent = locale === 'zh-CN'
+        ? `${percent}% · 滚轮缩放 / 拖动画布`
+        : `${percent}% · wheel to zoom / drag to pan`;
+    }
+
+    function fitGraphViewport(viewModel = graphState.viewModel) {
+      const activeView = viewModel || graphState.viewModel || { width: 1000, height: 640, nodes: [] };
+      const viewport = graphState.viewport || createDefaultGraphViewport();
+      const visibleNodes = (activeView.nodes || []).filter((node) => node.visible);
+
+      if (!visibleNodes.length) {
+        graphState.viewport = createDefaultGraphViewport();
+        if (typeof updateGraphViewportHud === 'function') updateGraphViewportHud();
+        if (typeof renderGraphVisualization === 'function') renderGraphVisualization(activeView);
+        return graphState.viewport;
+      }
+
+      let minX = Infinity;
+      let minY = Infinity;
+      let maxX = -Infinity;
+      let maxY = -Infinity;
+      visibleNodes.forEach((node) => {
+        const halfWidth = typeof node.boundsWidth === 'number' ? node.boundsWidth / 2 : (node.radius || 18);
+        const halfHeight = typeof node.boundsHeight === 'number' ? node.boundsHeight / 2 : (node.radius || 18);
+        minX = Math.min(minX, node.x - halfWidth);
+        minY = Math.min(minY, node.y - halfHeight);
+        maxX = Math.max(maxX, node.x + halfWidth);
+        maxY = Math.max(maxY, node.y + halfHeight);
+      });
+
+      const frameWidth = activeView.width || 1000;
+      const frameHeight = activeView.height || 640;
+      const padding = 88;
+      const contentWidth = Math.max(maxX - minX, 1);
+      const contentHeight = Math.max(maxY - minY, 1);
+      const fittedScale = Math.max(
+        0.08,
+        Math.min(
+          1,
+          Math.min((frameWidth - padding * 2) / contentWidth, (frameHeight - padding * 2) / contentHeight),
+        ),
+      );
+
+      viewport.scale = Number(fittedScale.toFixed(4));
+      viewport.translateX = Number((((frameWidth - (contentWidth * viewport.scale)) / 2) - (minX * viewport.scale)).toFixed(2));
+      viewport.translateY = Number((((frameHeight - (contentHeight * viewport.scale)) / 2) - (minY * viewport.scale)).toFixed(2));
+      graphState.viewport = viewport;
+
+      if (typeof updateGraphViewportHud === 'function') updateGraphViewportHud();
+      if (typeof renderGraphVisualization === 'function') renderGraphVisualization(activeView);
+      return viewport;
+    }
+
+    function zoomGraphIn() {
+      const viewport = graphState.viewport || createDefaultGraphViewport();
+      const viewModel = graphState.viewModel || { width: 1000, height: 640 };
+      const previousScale = viewport.scale || 1;
+      const nextScale = Math.min(2.6, Number((previousScale * 1.18).toFixed(4)));
+      const focusX = (viewModel.width || 1000) / 2;
+      const focusY = (viewModel.height || 640) / 2;
+
+      viewport.translateX = Number((viewport.translateX + (focusX * (previousScale - nextScale))).toFixed(2));
+      viewport.translateY = Number((viewport.translateY + (focusY * (previousScale - nextScale))).toFixed(2));
+      viewport.scale = nextScale;
+      graphState.viewport = viewport;
+
+      if (typeof updateGraphViewportHud === 'function') updateGraphViewportHud();
+      if (typeof renderGraphVisualization === 'function') renderGraphVisualization(viewModel);
+      return viewport;
+    }
+
+    function zoomGraphOut() {
+      const viewport = graphState.viewport || createDefaultGraphViewport();
+      const viewModel = graphState.viewModel || { width: 1000, height: 640 };
+      const previousScale = viewport.scale || 1;
+      const nextScale = Math.max(0.08, Number((previousScale / 1.18).toFixed(4)));
+      const focusX = (viewModel.width || 1000) / 2;
+      const focusY = (viewModel.height || 640) / 2;
+
+      viewport.translateX = Number((viewport.translateX + (focusX * (previousScale - nextScale))).toFixed(2));
+      viewport.translateY = Number((viewport.translateY + (focusY * (previousScale - nextScale))).toFixed(2));
+      viewport.scale = nextScale;
+      graphState.viewport = viewport;
+
+      if (typeof updateGraphViewportHud === 'function') updateGraphViewportHud();
+      if (typeof renderGraphVisualization === 'function') renderGraphVisualization(viewModel);
+      return viewport;
+    }
+
+    function resetGraphViewport() {
+      graphState.viewport = createDefaultGraphViewport();
+      if (typeof updateGraphViewportHud === 'function') updateGraphViewportHud();
+      if (typeof renderGraphVisualization === 'function') renderGraphVisualization(graphState.viewModel);
+      return graphState.viewport;
+    }
+
+    function bindGraphViewportInteractions() {
+      const canvas = document.getElementById('graphCanvas');
+      if (!canvas || canvas.dataset.viewportBound === 'true') return;
+
+      const projectPoint = (event) => {
+        const rect = canvas.getBoundingClientRect();
+        const viewModel = graphState.viewModel || { width: 1000, height: 640 };
+        return {
+          x: ((event.clientX - rect.left) / Math.max(rect.width, 1)) * (viewModel.width || 1000),
+          y: ((event.clientY - rect.top) / Math.max(rect.height, 1)) * (viewModel.height || 640),
+        };
+      };
+
+      const finishDrag = (event) => {
+        const pointer = graphState.pointer || {};
+        if (!pointer.active) return;
+        if (event && pointer.pointerId !== null && event.pointerId !== undefined && pointer.pointerId !== event.pointerId) return;
+        graphState.pointer = {
+          active: false,
+          pointerId: null,
+          startX: 0,
+          startY: 0,
+          originX: 0,
+          originY: 0,
+          didDrag: false,
+        };
+        canvas.classList.remove('is-dragging');
+      };
+
+      canvas.addEventListener('wheel', (event) => {
+        if (!graphState.viewModel) return;
+        event.preventDefault();
+        const viewport = graphState.viewport || createDefaultGraphViewport();
+        const previousScale = viewport.scale || 1;
+        const nextScale = Math.max(
+          0.08,
+          Math.min(2.6, Number((previousScale * (event.deltaY < 0 ? 1.08 : 0.92)).toFixed(4))),
+        );
+        if (nextScale === previousScale) return;
+        const focusPoint = projectPoint(event);
+        viewport.translateX = Number((viewport.translateX + (focusPoint.x * (previousScale - nextScale))).toFixed(2));
+        viewport.translateY = Number((viewport.translateY + (focusPoint.y * (previousScale - nextScale))).toFixed(2));
+        viewport.scale = nextScale;
+        graphState.viewport = viewport;
+        updateGraphViewportHud();
+        renderGraphVisualization(graphState.viewModel);
+      }, { passive: false });
+
+      canvas.addEventListener('pointerdown', (event) => {
+        if (event.button !== 0) return;
+        if (event.target && event.target.closest && event.target.closest('.graph-node')) return;
+        const rect = canvas.getBoundingClientRect();
+        const viewModel = graphState.viewModel || { width: 1000, height: 640 };
+        graphState.pointer = {
+          active: true,
+          pointerId: event.pointerId,
+          startX: event.clientX,
+          startY: event.clientY,
+          originX: (graphState.viewport && graphState.viewport.translateX) || 0,
+          originY: (graphState.viewport && graphState.viewport.translateY) || 0,
+          didDrag: false,
+          rectWidth: rect.width || 1,
+          rectHeight: rect.height || 1,
+          frameWidth: viewModel.width || 1000,
+          frameHeight: viewModel.height || 640,
+        };
+        canvas.classList.add('is-dragging');
+        if (canvas.setPointerCapture) canvas.setPointerCapture(event.pointerId);
+      });
+
+      canvas.addEventListener('pointermove', (event) => {
+        const pointer = graphState.pointer || {};
+        if (!pointer.active || pointer.pointerId !== event.pointerId) return;
+        const viewport = graphState.viewport || createDefaultGraphViewport();
+        const dx = ((event.clientX - pointer.startX) / Math.max(pointer.rectWidth, 1)) * pointer.frameWidth;
+        const dy = ((event.clientY - pointer.startY) / Math.max(pointer.rectHeight, 1)) * pointer.frameHeight;
+        viewport.translateX = Number((pointer.originX + dx).toFixed(2));
+        viewport.translateY = Number((pointer.originY + dy).toFixed(2));
+        graphState.viewport = viewport;
+        pointer.didDrag = pointer.didDrag || Math.hypot(dx, dy) > 8;
+        if (pointer.didDrag) graphState.suppressNextGraphClick = true;
+        updateGraphViewportHud();
+        renderGraphVisualization(graphState.viewModel);
+      });
+
+      canvas.addEventListener('pointerup', finishDrag);
+      canvas.addEventListener('pointercancel', finishDrag);
+      canvas.dataset.viewportBound = 'true';
+    }
+
+    function renderGraphTypeFilter(nodeTypes, currentValue) {
+      const el = document.getElementById('graphTypeFilter');
+      if (!el) return;
+      const items = ['all'].concat(nodeTypes || []);
+      const allLabel = locale === 'zh-CN' ? '全部类型' : 'All types';
+      el.innerHTML = items.map((item) => (
+        `<option value="${escapeHtml(item)}">${item === 'all' ? allLabel : escapeHtml(item)}</option>`
+      )).join('');
+      el.value = items.includes(currentValue) ? currentValue : 'all';
+    }
+
+    function renderGraphOverview(viewModel) {
+      const stats = viewModel && viewModel.stats ? viewModel.stats : {
+        totalNodes: 0,
+        totalEdges: 0,
+        visibleNodes: 0,
+        visibleEdges: 0,
+      };
+      const statMap = {
+        graphStatNodes: stats.totalNodes,
+        graphStatEdges: stats.totalEdges,
+        graphStatVisibleNodes: stats.visibleNodes,
+        graphStatVisibleEdges: stats.visibleEdges,
+      };
+      Object.entries(statMap).forEach(([id, value]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = String(value);
+      });
+
+      const legend = document.getElementById('graphLegend');
+      if (legend) {
+        const lanes = (viewModel && viewModel.lanes) || [];
+        if (!lanes.length) {
+          legend.innerHTML = `<span class="graph-mini-note">${locale === 'zh-CN' ? '暂无节点类型' : 'No node types yet'}</span>`;
+        } else {
+          legend.innerHTML = lanes.map((lane) => (
+            `<span class="graph-legend-chip"><span class="graph-legend-dot" style="background:${lane.color}"></span>${escapeHtml(lane.displayLabel)} · ${lane.visibleCount}/${lane.count}</span>`
+          )).join('');
+        }
+      }
+
+      const relationSummary = document.getElementById('graphRelationSummary');
+      if (relationSummary) {
+        const counts = viewModel && viewModel.relationCounts ? Object.entries(viewModel.relationCounts) : [];
+        if (!counts.length) {
+          relationSummary.innerHTML = locale === 'zh-CN'
+            ? '当前筛选条件下没有可见关系。'
+            : 'No visible relations under the current filter.';
+        } else {
+          relationSummary.innerHTML = counts.sort((a, b) => b[1] - a[1]).map(([key, value]) => (
+            `<div class="kv-row"><div class="kv-key">${escapeHtml(key)}</div><div class="kv-value">${value}</div></div>`
+          )).join('');
+        }
+      }
+    }
+
+    function renderGraphDetails(viewModel) {
+      const nodeDetail = document.getElementById('graphNodeDetail');
+      const edgeDetail = document.getElementById('graphEdgeDetail');
+      const selectedNode = viewModel && viewModel.nodes
+        ? viewModel.nodes.find((node) => node.id === viewModel.selectedNodeId)
+        : null;
+
+      if (!selectedNode) {
+        if (nodeDetail) nodeDetail.textContent = locale === 'zh-CN' ? '选择一个节点查看详情' : 'Select a node to inspect details';
+        if (edgeDetail) edgeDetail.textContent = locale === 'zh-CN' ? '选择一个关系查看详情' : 'Select an edge to inspect details';
+        return;
+      }
+
+      const visibleEdges = (viewModel.edges || []).filter((edge) => edge.visible);
+      const incidentEdges = visibleEdges.filter((edge) => edge.source === selectedNode.id || edge.target === selectedNode.id);
+      const tagBits = []
+        .concat((selectedNode.aliases || []).map((item) => ({ label: `alias · ${item}` })))
+        .concat((selectedNode.tags || []).map((item) => ({ label: `tag · ${item}` })));
+
+      if (nodeDetail) {
+        nodeDetail.innerHTML = `
+          <div class="graph-detail-title">${escapeHtml(selectedNode.label)}</div>
+          <div>${escapeHtml(selectedNode.summary || (locale === 'zh-CN' ? '暂无摘要' : 'No summary available'))}</div>
+          <div class="graph-detail-meta">
+            <span>${escapeHtml(selectedNode.nodeType)}</span>
+            <span>${escapeHtml(selectedNode.layer || 'graph')}</span>
+            <span>${selectedNode.degree} ${locale === 'zh-CN' ? '条关联' : 'links'}</span>
+          </div>
+          ${tagBits.length ? `<div class="graph-detail-meta">${tagBits.map((item) => `<span>${escapeHtml(item.label)}</span>`).join('')}</div>` : ''}
+          <div class="graph-mini-note">${escapeHtml(selectedNode.id)}</div>
+        `;
+      }
+
+      if (edgeDetail) {
+        if (!incidentEdges.length) {
+          edgeDetail.textContent = locale === 'zh-CN' ? '当前节点没有可见关系。' : 'The selected node has no visible edges.';
+        } else {
+          edgeDetail.innerHTML = incidentEdges.map((edge) => {
+            const otherId = edge.source === selectedNode.id ? edge.target : edge.source;
+            const otherNode = (viewModel.nodes || []).find((node) => node.id === otherId);
+            return `
+              <div class="graph-edge-item">
+                <div class="graph-edge-relation">${escapeHtml(edge.relation)}</div>
+                <div class="graph-edge-route">${escapeHtml(selectedNode.label)} → ${escapeHtml(otherNode ? otherNode.label : otherId)}</div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+    }
+
+    function selectGraphNode(nodeId) {
+      if (!nodeId) return;
+      if (graphState.suppressNextGraphClick) {
+        graphState.suppressNextGraphClick = false;
+        return;
+      }
+      graphState.selectedNodeId = nodeId;
+      graphState.preserveViewportOnNextFilter = true;
+      applyGraphFilters();
+    }
+
+    function renderGraphVisualization(viewModel) {
+      const canvas = document.getElementById('graphCanvas');
+      if (!canvas) return;
+
+      const activeView = viewModel || graphState.viewModel || { width: 1000, height: 640, nodes: [], edges: [], lanes: [] };
+      graphState.viewModel = activeView;
+      graphState.viewport = graphState.viewport || createDefaultGraphViewport();
+      bindGraphViewportInteractions();
+
+      const visibleNodes = (activeView.nodes || []).filter((node) => node.visible);
+      const visibleEdges = (activeView.edges || []).filter((edge) => edge.visible);
+      const nodeMap = {};
+      visibleNodes.forEach((node) => {
+        nodeMap[node.id] = node;
+      });
+
+      canvas.setAttribute('viewBox', `0 0 ${activeView.width || 1000} ${activeView.height || 640}`);
+
+      if (!visibleNodes.length) {
+        canvas.innerHTML = `
+          <g id="graphScene">
+            <text class="graph-empty-state" x="${(activeView.width || 1000) / 2}" y="${(activeView.height || 640) / 2}" text-anchor="middle">
+              ${escapeHtml(locale === 'zh-CN' ? '没有符合条件的记忆节点' : 'No visible memory nodes')}
+            </text>
+          </g>
+        `;
+        updateGraphViewportHud();
+        renderGraphDetails(activeView);
+        return;
+      }
+
+      const viewport = graphState.viewport || createDefaultGraphViewport();
+      const selectedNodeId = activeView.selectedNodeId;
+      const selectedEdgeIds = new Set(
+        visibleEdges.filter((edge) => edge.source === selectedNodeId || edge.target === selectedNodeId).map((edge) => edge.id),
+      );
+      const laneHeight = Math.max((activeView.height || 640) - 190, 240);
+      const laneMarkup = ((activeView.lanes || []).filter((lane) => lane.count > 0)).map((lane) => {
+        return `
+          <g class="graph-lane">
+            <rect class="graph-lane-column" x="${lane.x - 86}" y="86" width="172" height="${laneHeight}" rx="26"></rect>
+            <text class="graph-lane-title" x="${lane.x}" y="52">${escapeHtml(lane.displayLabel)}</text>
+            <text class="graph-lane-meta" x="${lane.x}" y="70">${escapeHtml(`${lane.visibleCount}/${lane.count} ${locale === 'zh-CN' ? '节点' : 'nodes'}`)}</text>
+          </g>
+        `;
+      }).join('');
+
+      const edgeMarkup = visibleEdges.map((edge) => {
+        const source = nodeMap[edge.source];
+        const target = nodeMap[edge.target];
+        if (!source || !target) return '';
+        const sourceHalfWidth = (source.boundsWidth || 176) / 2;
+        const targetHalfWidth = (target.boundsWidth || 176) / 2;
+        const sameLane = source.laneIndex === target.laneIndex;
+        const leftToRight = source.x <= target.x;
+        const sourceX = sameLane
+          ? source.x + sourceHalfWidth - 12
+          : source.x + (leftToRight ? sourceHalfWidth - 12 : -sourceHalfWidth + 12);
+        const targetX = sameLane
+          ? target.x + targetHalfWidth - 12
+          : target.x + (leftToRight ? -targetHalfWidth + 12 : targetHalfWidth - 12);
+        const sourceY = source.y;
+        const targetY = target.y;
+        let controlOffset = Math.max(46, Math.abs(targetX - sourceX) * 0.38);
+        let control1X = leftToRight ? sourceX + controlOffset : sourceX - controlOffset;
+        let control2X = leftToRight ? targetX - controlOffset : targetX + controlOffset;
+        if (sameLane) {
+          control1X = sourceX + 94;
+          control2X = targetX + 94;
+        }
+        return `<path class="graph-edge${selectedEdgeIds.has(edge.id) ? ' is-selected' : ''}" d="M ${sourceX} ${sourceY} C ${control1X} ${sourceY} ${control2X} ${targetY} ${targetX} ${targetY}" />`;
+      }).join('');
+
+      const nodeMarkup = visibleNodes.map((node) => {
+        const cardWidth = node.boundsWidth || 176;
+        const cardHeight = node.boundsHeight || 58;
+        const cardX = node.x - (cardWidth / 2);
+        const cardY = node.y - (cardHeight / 2);
+        const maxLabelLength = node.nodeType === 'alias' ? 20 : 26;
+        const rawLabel = String(node.label || node.id);
+        const displayLabel = rawLabel.length > maxLabelLength ? `${rawLabel.slice(0, maxLabelLength - 1)}…` : rawLabel;
+        const metaLabel = locale === 'zh-CN'
+          ? `${node.nodeType} · ${node.degree} 条关联`
+          : `${node.nodeType} · ${node.degree} links`;
+        return `
+          <g class="graph-node${node.id === selectedNodeId ? ' is-selected' : ''}${node.primary ? ' is-primary' : ''}" data-node-id="${escapeHtml(node.id)}">
+            <rect class="graph-node-glow" x="${cardX - 6}" y="${cardY - 6}" width="${cardWidth + 12}" height="${cardHeight + 12}" rx="22"></rect>
+            <rect class="graph-node-card" x="${cardX}" y="${cardY}" width="${cardWidth}" height="${cardHeight}" rx="18" stroke="${node.color}"></rect>
+            <rect class="graph-node-accent" x="${cardX}" y="${cardY}" width="${cardWidth}" height="9" rx="18" fill="${node.color}"></rect>
+            <circle cx="${cardX + 18}" cy="${cardY + 24}" r="6" fill="${node.color}"></circle>
+            <text class="graph-node-title" x="${cardX + 34}" y="${cardY + 27}">${escapeHtml(displayLabel)}</text>
+            <text class="graph-node-micro" x="${cardX + 34}" y="${cardY + 45}">${escapeHtml(metaLabel)}</text>
+            <text class="graph-node-degree" x="${cardX + cardWidth - 14}" y="${cardY + 29}" text-anchor="end">${node.degree}</text>
+          </g>
+        `;
+      }).join('');
+
+      canvas.innerHTML = `
+        <g id="graphScene" transform="translate(${viewport.translateX} ${viewport.translateY}) scale(${viewport.scale})">
+          ${laneMarkup}
+          ${edgeMarkup}
+          ${nodeMarkup}
+        </g>
+      `;
+
+      Array.from(canvas.querySelectorAll('.graph-node')).forEach((nodeEl) => {
+        nodeEl.addEventListener('click', () => {
+          selectGraphNode(nodeEl.getAttribute('data-node-id'));
+        });
+      });
+
+      updateGraphViewportHud();
+      renderGraphDetails(activeView);
+    }
+
+    function renderGraphCollections(viewModel) {
+      const visibleNodes = (viewModel.nodes || []).filter((node) => node.visible).slice().sort((a, b) => {
+        return (a.laneIndex || 0) - (b.laneIndex || 0) || a.y - b.y || a.id.localeCompare(b.id);
+      });
+      const visibleEdges = (viewModel.edges || []).filter((edge) => edge.visible);
+      const nodeMap = {};
+      visibleNodes.forEach((node) => {
+        nodeMap[node.id] = node;
+      });
+
+      renderSelectableList(
+        'graphNodeList',
+        visibleNodes.map((node) => ({
+          key: `${node.label} · ${node.nodeType} · ${node.degree}`,
+          value: node,
+        })),
+        (node) => selectGraphNode(node.id),
+        locale === 'zh-CN' ? '没有可见节点' : 'No visible nodes',
+      );
+
+      renderSelectableList(
+        'graphEdgeList',
+        visibleEdges.map((edge) => {
+          const source = nodeMap[edge.source];
+          const target = nodeMap[edge.target];
+          return {
+            key: `${source ? source.label : edge.source} - ${edge.relation} - ${target ? target.label : edge.target}`,
+            value: edge,
+          };
+        }),
+        (edge) => {
+          const source = nodeMap[edge.source];
+          const target = nodeMap[edge.target];
+          const detail = document.getElementById('graphEdgeDetail');
+          if (detail) {
+            detail.innerHTML = `
+              <div class="graph-edge-item">
+                <div class="graph-edge-relation">${escapeHtml(edge.relation)}</div>
+                <div class="graph-edge-route">${escapeHtml(source ? source.label : edge.source)} → ${escapeHtml(target ? target.label : edge.target)}</div>
+              </div>
+            `;
+          }
+        },
+        locale === 'zh-CN' ? '没有可见关系' : 'No visible edges',
+      );
+    }
+
+    function applyGraphFilters() {
+      const searchInput = document.getElementById('graphSearchInput');
+      const typeFilter = document.getElementById('graphTypeFilter');
+      const viewModel = buildGraphViewModel(graphState.rawNodes, graphState.rawEdges, {
+        search: searchInput ? searchInput.value : '',
+        nodeType: typeFilter ? typeFilter.value : 'all',
+        selectedNodeId: graphState.selectedNodeId || null,
+      });
+      graphState.viewModel = viewModel;
+      graphState.selectedNodeId = viewModel.selectedNodeId;
+      renderGraphOverview(viewModel);
+      if (graphState.preserveViewportOnNextFilter) {
+        graphState.preserveViewportOnNextFilter = false;
+        renderGraphVisualization(viewModel);
+      } else if (typeof fitGraphViewport === 'function') {
+        fitGraphViewport(viewModel);
+      } else {
+        renderGraphVisualization(viewModel);
+      }
+      renderGraphCollections(viewModel);
+      return viewModel;
+    }
+
+    async function loadGraph() {
+      const nodesPayload = await getJson('/api/layer?layer=graph.nodes');
+      const edgesPayload = await getJson('/api/layer?layer=graph.edges');
+      graphState.rawNodes = nodesPayload.data || {};
+      graphState.rawEdges = edgesPayload.data || [];
+      const searchInput = document.getElementById('graphSearchInput');
+      const typeFilter = document.getElementById('graphTypeFilter');
+      const viewModel = buildGraphViewModel(graphState.rawNodes, graphState.rawEdges, {
+        search: searchInput ? searchInput.value : '',
+        nodeType: typeFilter ? typeFilter.value : 'all',
+        selectedNodeId: graphState.selectedNodeId || null,
+      });
+      graphState.viewModel = viewModel;
+      graphState.selectedNodeId = viewModel.selectedNodeId;
+      graphState.preserveViewportOnNextFilter = false;
+      renderGraphTypeFilter(viewModel.nodeTypes, typeFilter ? typeFilter.value : 'all');
+      renderGraphOverview(viewModel);
+      if (typeof fitGraphViewport === 'function') {
+        fitGraphViewport(viewModel);
+      } else {
+        renderGraphVisualization(viewModel);
+      }
+      renderGraphCollections(viewModel);
+    }
+
+    async function refreshGraph() {
+      const statusEl = document.getElementById('graphRefreshStatus');
+      const isZh = typeof locale !== 'undefined' && locale === 'zh-CN';
+      statusEl.textContent = isZh ? '正在重建图谱...' : 'Rebuilding graph...';
+
+      const payload = await postJson('/api/graph/refresh', {});
+      if (!payload.ok) {
+        const message = (payload.error && payload.error.message) || (isZh ? '图谱重建失败' : 'Failed to rebuild graph');
+        statusEl.textContent = message;
+        return payload;
+      }
+
+      const data = payload.data || {};
+      const nodes = data.graph_nodes ?? 0;
+      const edges = data.graph_edges ?? 0;
+      statusEl.textContent = isZh
+        ? `图谱已重建：${nodes} 个节点 · ${edges} 条边`
+        : `Graph rebuilt: ${nodes} nodes · ${edges} edges`;
+
+      await loadGraph();
+      if (typeof loadSummary === 'function') await loadSummary();
+      return payload;
+    }
+
+    async function loadReport() {
+      const payload = await getJson('/api/report?name=memory_v2_realish_baseline');
+      const data = payload.data || {};
+      document.getElementById('reportSummary').innerHTML = `<p><strong>Pass rate:</strong> ${data.pass_rate ?? '-'} · <strong>Passed:</strong> ${data.passed ?? '-'} / ${data.total ?? '-'}</p>`;
+      document.getElementById('reportData').textContent = JSON.stringify(payload, null, 2);
+    }
+
+    applyI18n();
+    loadSummary();
+    loadLayerList();
+    loadSpecialPanel('models', 'modelsList', 'modelsDetail');
+    loadSpecialPanel('skills', 'skillsList', 'skillsDetail');
+    loadSpecialPanel('migration_candidates', 'migrationCandidatesList', 'migrationCandidatesDetail');
+    loadSpecialPanel('skill_proposals', 'skillProposalsList', 'skillProposalsDetail');
+  </script>
+</body>
+</html>

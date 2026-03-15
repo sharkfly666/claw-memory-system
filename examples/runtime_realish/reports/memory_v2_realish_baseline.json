@@ -1,0 +1,246 @@
+{
+  "total": 15,
+  "passed": 14,
+  "pass_rate": 0.9333333333333333,
+  "results": [
+    {
+      "case_id": "real-001",
+      "query": "direct efficient communication",
+      "route": "preference",
+      "expected_sources": [
+        "preferences"
+      ],
+      "actual_sources": [
+        "preferences"
+      ],
+      "matched": true,
+      "hit_count": 1
+    },
+    {
+      "case_id": "real-002",
+      "query": "proactive autonomous collaboration",
+      "route": "preference",
+      "expected_sources": [
+        "preferences"
+      ],
+      "actual_sources": [
+        "preferences"
+      ],
+      "matched": true,
+      "hit_count": 1
+    },
+    {
+      "case_id": "real-003",
+      "query": "technical architecture judgment",
+      "route": "preference",
+      "expected_sources": [
+        "preferences"
+      ],
+      "actual_sources": [
+        "preferences"
+      ],
+      "matched": true,
+      "hit_count": 1
+    },
+    {
+      "case_id": "real-004",
+      "query": "memory evaluation task",
+      "route": "task",
+      "expected_sources": [
+        "tasks",
+        "sessions"
+      ],
+      "actual_sources": [
+        "sessions",
+        "tasks",
+        "tasks",
+        "episodes",
+        "episodes",
+        "episodes",
+        "episodes",
+        "graph.expanded",
+        "graph.expanded",
+        "graph.expanded"
+      ],
+      "matched": true,
+      "hit_count": 10
+    },
+    {
+      "case_id": "real-005",
+      "query": "memory loss validation",
+      "route": "task",
+      "expected_sources": [
+        "tasks",
+        "episodes"
+      ],
+      "actual_sources": [
+        "sessions",
+        "tasks",
+        "episodes",
+        "episodes",
+        "episodes",
+        "graph.expanded",
+        "graph.expanded",
+        "graph.expanded"
+      ],
+      "matched": true,
+      "hit_count": 8
+    },
+    {
+      "case_id": "real-006",
+      "query": "memory minscore configuration",
+      "route": "fact",
+      "expected_sources": [
+        "facts",
+        "episodes"
+      ],
+      "actual_sources": [
+        "facts",
+        "episodes",
+        "episodes",
+        "episodes",
+        "graph.expanded"
+      ],
+      "matched": true,
+      "hit_count": 5
+    },
+    {
+      "case_id": "real-007",
+      "query": "gateway restart memory config",
+      "route": "history",
+      "expected_sources": [
+        "episodes",
+        "facts"
+      ],
+      "actual_sources": [
+        "episodes"
+      ],
+      "matched": true,
+      "hit_count": 1
+    },
+    {
+      "case_id": "real-008",
+      "query": "workspace path",
+      "route": "fact",
+      "expected_sources": [
+        "facts"
+      ],
+      "actual_sources": [
+        "facts",
+        "episodes",
+        "graph.expanded"
+      ],
+      "matched": true,
+      "hit_count": 3
+    },
+    {
+      "case_id": "real-009",
+      "query": "daily briefing 8:00",
+      "route": "fact",
+      "expected_sources": [
+        "facts",
+        "episodes"
+      ],
+      "actual_sources": [
+        "facts",
+        "facts",
+        "facts",
+        "facts",
+        "episodes",
+        "episodes",
+        "episodes",
+        "episodes",
+        "graph.expanded"
+      ],
+      "matched": true,
+      "hit_count": 9
+    },
+    {
+      "case_id": "real-010",
+      "query": "briefing timeout send failure",
+      "route": "history",
+      "expected_sources": [
+        "episodes",
+        "tasks"
+      ],
+      "actual_sources": [],
+      "matched": false,
+      "hit_count": 0
+    },
+    {
+      "case_id": "real-011",
+      "query": "memos worse than old approach",
+      "route": "history",
+      "expected_sources": [
+        "episodes",
+        "tasks"
+      ],
+      "actual_sources": [
+        "episodes",
+        "graph.expanded"
+      ],
+      "matched": true,
+      "hit_count": 2
+    },
+    {
+      "case_id": "real-012",
+      "query": "qwik vue2 evaluation",
+      "route": "history",
+      "expected_sources": [
+        "episodes",
+        "tasks"
+      ],
+      "actual_sources": [
+        "episodes",
+        "graph.expanded"
+      ],
+      "matched": true,
+      "hit_count": 2
+    },
+    {
+      "case_id": "real-013",
+      "query": "vue3 nuxt3 preferred upgrade path",
+      "route": "history",
+      "expected_sources": [
+        "episodes",
+        "tasks"
+      ],
+      "actual_sources": [
+        "episodes",
+        "graph.expanded"
+      ],
+      "matched": true,
+      "hit_count": 2
+    },
+    {
+      "case_id": "real-014",
+      "query": "pansou multi cloud search",
+      "route": "fact",
+      "expected_sources": [
+        "facts",
+        "episodes"
+      ],
+      "actual_sources": [
+        "facts"
+      ],
+      "matched": true,
+      "hit_count": 1
+    },
+    {
+      "case_id": "real-015",
+      "query": "memory redesign discussion",
+      "route": "history",
+      "expected_sources": [
+        "episodes"
+      ],
+      "actual_sources": [
+        "episodes",
+        "episodes",
+        "episodes",
+        "graph.expanded"
+      ],
+      "matched": true,
+      "hit_count": 4
+    }
+  ]
+}

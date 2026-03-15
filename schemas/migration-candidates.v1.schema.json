@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "migration-candidates.v1.schema.json",
+  "title": "Migration Candidates Store V1",
+  "type": "object",
+  "required": ["schema_version", "candidates"],
+  "properties": {
+    "schema_version": { "const": "migration-candidates.v1" },
+    "updated_at": { "type": "string" },
+    "candidates": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["candidate_id", "created_at", "updated_at"],
+        "properties": {
+          "candidate_id": { "type": "string" },
+          "source_layer": { "type": "string" },
+          "source_id": { "type": "string" },
+          "target_layer": { "type": "string" },
+          "target_id": { "type": ["string", "null"] },
+          "summary": { "type": "string" },
+          "status": { "type": "string" },
+          "confidence": { "type": "number" },
+          "created_at": { "type": "string" },
+          "updated_at": { "type": "string" }
+        }
+      }
+    }
+  }
+}

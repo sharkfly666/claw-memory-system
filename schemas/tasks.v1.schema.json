@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tasks.v1.schema.json",
+  "title": "Tasks Store V1",
+  "type": "object",
+  "required": ["schema_version", "tasks"],
+  "properties": {
+    "schema_version": { "const": "tasks.v1" },
+    "updated_at": { "type": "string" },
+    "tasks": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["task_id", "created_at", "updated_at"],
+        "properties": {
+          "task_id": { "type": "string" },
+          "title": { "type": "string" },
+          "summary": { "type": "string" },
+          "state": { "type": "string" },
+          "priority": { "type": "string" },
+          "next_action": { "type": ["string", "null"] },
+          "related_entities": { "type": "array", "items": { "type": "string" } },
+          "source_refs": { "type": "array", "items": { "type": "string" } },
+          "created_at": { "type": "string" },
+          "updated_at": { "type": "string" },
+          "last_active_at": { "type": "string" }
+        }
+      }
+    }
+  }
+}

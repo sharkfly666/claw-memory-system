@@ -1,0 +1,38 @@
+{
+  "name": "claw-memory-system",
+  "version": "0.1.0",
+  "description": "OpenClaw plugin bridge for the claw-memory-system Python runtime",
+  "type": "module",
+  "main": "index.ts",
+  "files": [
+    "index.ts",
+    "openclaw.plugin.json",
+    "pyproject.toml",
+    "README.md",
+    "README.zh-CN.md",
+    "docs/openclaw-plugin-install.md",
+    "docs/openclaw-plugin-install.zh-CN.md",
+    "schemas/*.json",
+    "scripts/*.py",
+    "scripts/*.sh",
+    "src/claw_memory_system/*.py",
+    "webapp/index.html"
+  ],
+  "keywords": [
+    "openclaw",
+    "openclaw-plugin",
+    "memory",
+    "facts",
+    "exact-search",
+    "migration"
+  ],
+  "openclaw": {
+    "id": "claw-memory-system",
+    "extensions": [
+      "./index.ts"
+    ]
+  },
+  "peerDependencies": {
+    "openclaw": ">=2026.2.0"
+  }
+}

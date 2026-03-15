@@ -1,0 +1,26 @@
+[
+  {
+    "case_id": "pref-001",
+    "query": "direct efficient communication",
+    "expected_sources": ["preferences"],
+    "description": "preference routing"
+  },
+  {
+    "case_id": "task-001",
+    "query": "memory v2 task",
+    "expected_sources": ["sessions", "tasks"],
+    "description": "session/task routing"
+  },
+  {
+    "case_id": "fact-001",
+    "query": "workspace path",
+    "expected_sources": ["facts"],
+    "description": "fact routing"
+  },
+  {
+    "case_id": "hist-001",
+    "query": "memory redesign discussion",
+    "expected_sources": ["episodes"],
+    "description": "history routing"
+  }
+]

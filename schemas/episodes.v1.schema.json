@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "episodes.v1.schema.json",
+  "title": "Episodes Store V1",
+  "type": "object",
+  "required": ["schema_version", "episodes"],
+  "properties": {
+    "schema_version": { "const": "episodes.v1" },
+    "updated_at": { "type": "string" },
+    "episodes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["episode_id", "created_at", "updated_at"],
+        "properties": {
+          "episode_id": { "type": "string" },
+          "title": { "type": "string" },
+          "summary": { "type": "string" },
+          "status": { "type": "string" },
+          "task_ids": { "type": "array", "items": { "type": "string" } },
+          "source_refs": { "type": "array", "items": { "type": "string" } },
+          "created_at": { "type": "string" },
+          "updated_at": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": "session.v1",
+  "updated_at": "2026-03-13T13:58:08+08:00",
+  "sessions": {
+    "main": {
+      "active_topics": [
+        "memory evaluation",
+        "memory v2",
+        "qwik evaluation"
+      ],
+      "active_task_ids": [
+        "task-memory-eval"
+      ],
+      "recent_decisions": [
+        "upgrade existing claw-memory-system instead of rewriting"
+      ],
+      "open_questions": [
+        "when to add admin api and console"
+      ],
+      "next_actions": [
+        "continue v2 implementation"
+      ],
+      "session_key": "main",
+      "created_at": "2026-03-13T13:46:48+08:00",
+      "updated_at": "2026-03-13T13:58:08+08:00",
+      "status": "active"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "session.v1.schema.json",
+  "title": "Session Store V1",
+  "type": "object",
+  "required": ["schema_version", "sessions"],
+  "properties": {
+    "schema_version": { "const": "session.v1" },
+    "updated_at": { "type": "string" },
+    "sessions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["session_key", "created_at", "updated_at"],
+        "properties": {
+          "session_key": { "type": "string" },
+          "status": { "type": "string" },
+          "active_topics": { "type": "array", "items": { "type": "string" } },
+          "active_task_ids": { "type": "array", "items": { "type": "string" } },
+          "recent_decisions": { "type": "array", "items": { "type": "string" } },
+          "open_questions": { "type": "array", "items": { "type": "string" } },
+          "next_actions": { "type": "array", "items": { "type": "string" } },
+          "created_at": { "type": "string" },
+          "updated_at": { "type": "string" }
+        }
+      }
+    }
+  }
+}

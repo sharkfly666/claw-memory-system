@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "models.v1.schema.json",
+  "title": "Model Profiles V1",
+  "type": "object",
+  "required": ["schema_version", "profiles"],
+  "properties": {
+    "schema_version": { "const": "models.v1" },
+    "updated_at": { "type": "string" },
+    "profiles": {
+      "type": "object",
+      "properties": {
+        "embedding": { "$ref": "#/$defs/profileList" },
+        "summarization": { "$ref": "#/$defs/profileList" },
+        "skill_evolution": { "$ref": "#/$defs/profileList" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "profileList": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "provider", "model"],
+        "properties": {
+          "name": { "type": "string" },
+          "provider": { "type": "string" },
+          "model": { "type": "string" },
+          "base_url": { "type": ["string", "null"] },
+          "api_key_ref": { "type": ["string", "null"] },
+          "notes": { "type": ["string", "null"] }
+        }
+      }
+    }
+  }
+}
