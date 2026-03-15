@@ -32,7 +32,11 @@ The system does **not** directly write every captured turn into structured memor
 5. Only enable lifecycle auto capture explicitly when you want queue-only capture
 
 ## Key docs
+- `docs/autonomous-memory-runtime.md`
 - `docs/autonomous-memory-runtime.zh-CN.md`
-- `docs/portable-release-checklist.zh-CN.md`
-- `docs/lifecycle-integration-notes.zh-CN.md`
-- `docs/release-v0.1-checklist.zh-CN.md`
+- `docs/quickstart-openclaw-chat-install.zh-CN.md`
+- `docs/full-enable-guide.zh-CN.md`
+- `docs/release-notes-v0.1.zh-CN.md`
+- `docs/final-release-matrix.zh-CN.md`
+
+Historical implementation plans have been moved under `docs/archive/plans/` to keep the release surface clean.

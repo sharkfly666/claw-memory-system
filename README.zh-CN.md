@@ -31,7 +31,12 @@
 5. 如需生命周期自动捕获，再显式打开 `autoTurnCapture`
 
 ## 关键文档
+- `docs/quickstart-openclaw-chat-install.zh-CN.md`
+- `docs/full-enable-guide.zh-CN.md`
 - `docs/autonomous-memory-runtime.zh-CN.md`
+- `docs/release-notes-v0.1.zh-CN.md`
+- `docs/final-release-matrix.zh-CN.md`
 - `docs/portable-release-checklist.zh-CN.md`
 - `docs/lifecycle-integration-notes.zh-CN.md`
-- `docs/release-v0.1-checklist.zh-CN.md`
+
+历史过程性方案文档已归档到 `docs/archive/plans/`，避免干扰首次接触本项目的人。
