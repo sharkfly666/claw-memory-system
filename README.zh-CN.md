@@ -1,5 +1,7 @@
 # Claw Memory System
 
+[English](README.md) | 简体中文
+
 本项目是一个面向 OpenClaw 的本地优先混合记忆系统。
 
 ## v0.1 自动记忆运行时亮点
@@ -51,6 +53,27 @@ openclaw plugins enable memory-lancedb-pro
 - exact search
 
 但**语义召回能力会明显下降**，整体效果会打折。
+
+## Quickstart
+### 最小可用路径
+1. 先安装并启用 `memory-lancedb-pro`
+2. 再安装并启用本插件
+3. 如果当前 OpenClaw 环境使用显式 allowlist，请把两个插件都加入 `plugins.allow`
+4. 运行 bootstrap
+5. 启用或保留 batch governance 定时任务
+
+### 推荐命令
+```bash
+openclaw plugins install memory-lancedb-pro
+openclaw plugins enable memory-lancedb-pro
+openclaw plugins install <claw-memory-system-github-url>
+openclaw plugins enable claw-memory-system
+```
+
+然后执行：
+```text
+Call claw_memory_bootstrap
+```
 
 ## 推荐使用流程
 1. 先安装并启用 `memory-lancedb-pro`

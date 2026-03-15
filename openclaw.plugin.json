@@ -2,7 +2,7 @@
   "id": "claw-memory-system",
   "name": "Claw Memory System",
   "description": "OpenClaw tool plugin bridge for facts, exact search, migration checks, and workspace bootstrap.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "kind": "tool",
   "requirements": {
     "node": ">=18.0.0",

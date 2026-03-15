@@ -1,5 +1,7 @@
 # Claw Memory System
 
+English | [简体中文](README.zh-CN.md)
+
 Local-first hybrid memory system for OpenClaw.
 
 ## v0.1 autonomous memory runtime
@@ -46,6 +48,27 @@ openclaw plugins enable memory-lancedb-pro
 ```
 
 Without `memory-lancedb-pro`, this project still provides structured memory, queueing, governance, and exact search, but semantic recall quality will be significantly reduced.
+
+## Quickstart
+### Minimal path
+1. Install and enable `memory-lancedb-pro`
+2. Install and enable this plugin
+3. If your OpenClaw environment uses explicit plugin allowlists, add both plugins to `plugins.allow`
+4. Run bootstrap
+5. Enable or keep the batch governance cron
+
+### Recommended commands
+```bash
+openclaw plugins install memory-lancedb-pro
+openclaw plugins enable memory-lancedb-pro
+openclaw plugins install <claw-memory-system-github-url>
+openclaw plugins enable claw-memory-system
+```
+
+Then bootstrap the runtime:
+```text
+Call claw_memory_bootstrap
+```
 
 ## Recommended flow
 1. Install and enable `memory-lancedb-pro`

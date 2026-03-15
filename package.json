@@ -1,6 +1,6 @@
 {
   "name": "claw-memory-system",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "OpenClaw plugin bridge for the claw-memory-system Python runtime",
   "type": "module",
   "main": "index.ts",
