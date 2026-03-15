@@ -1,4 +1,4 @@
-# Release Notes v0.1
+# Release Notes v0.1.1
 
 ## 亮点
 - 引入结构化记忆层：facts / preferences / tasks / episodes
@@ -13,6 +13,7 @@
 - 即使开启，也默认只 queue，不直接写正式结构化层
 - batch governance 默认启用，推荐每 6 小时跑一次
 - classifier 需要通过 `turnCaptureMinConfidence` 才会入队
+- 完整功能依赖 `memory-lancedb-pro` 作为语义召回层
 
 ## 已知限制
 - post-turn classifier 当前为规则型，不是 LLM-powered semantic classifier

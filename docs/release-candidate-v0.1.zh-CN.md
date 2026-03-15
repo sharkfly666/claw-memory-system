@@ -1,4 +1,4 @@
-# Release Candidate v0.1
+# Release Candidate v0.1.1
 
 ## 版本定位
 这是 claw-memory-system 的第一个可发布候选版本，目标不是“最聪明”，而是：

@@ -11,7 +11,22 @@
 
 ## 一、推荐安装步骤
 
-### 1. 安装插件
+### 1. 先安装语义记忆依赖 `memory-lancedb-pro`
+为获得完整记忆效果，先安装并启用：
+
+```bash
+openclaw plugins install memory-lancedb-pro
+openclaw plugins enable memory-lancedb-pro
+```
+
+如果当前环境的默认插件源里没有该插件，则改用其仓库地址安装后再启用：
+
+```bash
+openclaw plugins install https://github.com/CortexReach/memory-lancedb-pro
+openclaw plugins enable memory-lancedb-pro
+```
+
+### 2. 安装本插件
 在 OpenClaw chat 中，或终端中执行：
 
 ```bash

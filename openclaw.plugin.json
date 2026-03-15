@@ -2,7 +2,7 @@
   "id": "claw-memory-system",
   "name": "Claw Memory System",
   "description": "OpenClaw tool plugin bridge for facts, exact search, migration checks, and workspace bootstrap.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "kind": "tool",
   "requirements": {
     "node": ">=18.0.0",
@@ -78,8 +78,9 @@
   },
   "setup": {
     "notes": [
-      "Keep memory-lancedb-pro as the active memory slot for semantic recall.",
-      "Use this plugin for facts, exact search, bootstrap, and integration diagnostics.",
+      "Full functionality requires memory-lancedb-pro as the active semantic memory slot.",
+      "Recommended tested stack for v0.1.0: openclaw >= 2026.2.0, claw-memory-system = 0.1.0, memory-lancedb-pro >= 1.1.0-beta.8 (repo: https://github.com/CortexReach/memory-lancedb-pro).",
+      "Use this plugin for structured memory, queue-first autonomous capture, governance, exact search, bootstrap, and diagnostics.",
       "If installed from a package copy, ensure the bundled repo contains src/, scripts/, schemas/, and webapp/.",
       "When the OpenClaw gateway is running, the management console is served under /plugins/claw-memory-system."
     ]

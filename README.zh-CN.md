@@ -23,12 +23,42 @@
 
 不会默认直接把每轮对话写进正式结构化层。
 
+## 完整功能的必要依赖
+如果要获得完整语义召回能力，**必须同时安装并启用 `memory-lancedb-pro`**。
+
+推荐测试组合（`v0.1.0`）：
+- `openclaw >= 2026.2.0`
+- `claw-memory-system = 0.1.0`
+- `memory-lancedb-pro >= 1.1.0-beta.8`
+
+推荐安装方式：
+```bash
+openclaw plugins install memory-lancedb-pro
+openclaw plugins enable memory-lancedb-pro
+```
+
+如果当前环境的默认插件源里没有 `memory-lancedb-pro`，则应改用该插件的仓库地址安装后再启用：
+
+```bash
+openclaw plugins install https://github.com/CortexReach/memory-lancedb-pro
+openclaw plugins enable memory-lancedb-pro
+```
+
+如果新环境里只有 `claw-memory-system`，没有 `memory-lancedb-pro`，本项目仍可提供：
+- structured memory
+- pending queue
+- batch governance
+- exact search
+
+但**语义召回能力会明显下降**，整体效果会打折。
+
 ## 推荐使用流程
-1. 安装并启用插件
-2. 运行 bootstrap
-3. 构建 exact index（可选）
-4. 启用 batch governance 定时任务
-5. 如需生命周期自动捕获，再显式打开 `autoTurnCapture`
+1. 先安装并启用 `memory-lancedb-pro`
+2. 再安装并启用本插件
+3. 运行 bootstrap
+4. 构建 exact index（可选）
+5. 启用 batch governance 定时任务
+6. 如需生命周期自动捕获，再显式打开 `autoTurnCapture`
 
 ## 关键文档
 - `docs/quickstart-openclaw-chat-install.zh-CN.md`

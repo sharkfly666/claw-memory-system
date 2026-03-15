@@ -24,12 +24,36 @@ Default principle:
 
 The system does **not** directly write every captured turn into structured memory by default.
 
+## Required companion dependency for full functionality
+For full semantic recall, install and enable **`memory-lancedb-pro`** alongside this plugin.
+
+Recommended tested stack for `v0.1.0`:
+- `openclaw >= 2026.2.0`
+- `claw-memory-system = 0.1.0`
+- `memory-lancedb-pro >= 1.1.0-beta.8`
+
+Recommended install path:
+```bash
+openclaw plugins install memory-lancedb-pro
+openclaw plugins enable memory-lancedb-pro
+```
+
+If the current environment does not expose `memory-lancedb-pro` via the default plugin source, install it from its repository source instead, then enable it:
+
+```bash
+openclaw plugins install https://github.com/CortexReach/memory-lancedb-pro
+openclaw plugins enable memory-lancedb-pro
+```
+
+Without `memory-lancedb-pro`, this project still provides structured memory, queueing, governance, and exact search, but semantic recall quality will be significantly reduced.
+
 ## Recommended flow
-1. Install and enable the plugin
-2. Run bootstrap
-3. Build the exact index (optional)
-4. Enable or keep the batch governance cron
-5. Only enable lifecycle auto capture explicitly when you want queue-only capture
+1. Install and enable `memory-lancedb-pro`
+2. Install and enable this plugin
+3. Run bootstrap
+4. Build the exact index (optional)
+5. Enable or keep the batch governance cron
+6. Only enable lifecycle auto capture explicitly when you want queue-only capture
 
 ## Key docs
 - `docs/autonomous-memory-runtime.md`

@@ -6,6 +6,7 @@
 完整功能并不等于“激进自动写入”。
 
 对于 v0.1，推荐的 full enable 状态是：
+- `memory-lancedb-pro` 已安装并启用
 - plugin enabled
 - runtime bootstrapped
 - semantic memory 继续由 `memory-lancedb-pro` 提供
@@ -48,13 +49,26 @@
 - 行为对新用户更可预测
 
 ## 四、推荐配套动作
-### 1. 启用 batch governance cron
+### 1. 确认 `memory-lancedb-pro` 已安装并启用
+优先尝试：
+```bash
+openclaw plugins install memory-lancedb-pro
+openclaw plugins enable memory-lancedb-pro
+```
+如果默认插件源没有该插件，则改用其仓库地址安装：
+
+```bash
+openclaw plugins install https://github.com/CortexReach/memory-lancedb-pro
+openclaw plugins enable memory-lancedb-pro
+```
+
+### 2. 启用 batch governance cron
 建议每 6 小时一次。
 
-### 2. 保留 governance report / batch report
+### 3. 保留 governance report / batch report
 这样才能审计自动吸收的结果。
 
-### 3. 不要关闭 semantic memory
+### 4. 不要关闭 semantic memory
 `memory-lancedb-pro` 继续提供语义召回。
 
 ## 五、如何判断“100% 功能已启用”
