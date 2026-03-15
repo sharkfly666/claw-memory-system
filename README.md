@@ -13,6 +13,37 @@ Local-first hybrid memory system for OpenClaw.
 - Dedupe / merge / supersede / noop
 - Fresh-workspace smoke path passes
 
+## Architecture at a glance
+```mermaid
+flowchart TD
+    A[OpenClaw chat / sessions / cron] --> B[Turn capture via agent_end\nqueue-only when enabled]
+    B --> C[Post-turn classifier]
+    C --> D[Pending queue\nturn_candidates.json]
+    D --> E[Batch governance]
+    E --> F[Candidate drafts / preview / merge / supersede / noop]
+    F --> G[Structured memory\nfacts / preferences / tasks / episodes]
+    G --> H[Graph + reports]
+    G --> I[Exact search index]
+    J[memory-lancedb-pro\nsemantic recall layer] --> K[Semantic recall / hybrid memory]
+    A --> K
+    I --> L[Deterministic lookup]
+    H --> M[Admin console / audits]
+    K --> M
+    L --> M
+```
+
+## Capability matrix
+| Capability | Purpose | Default | Dependency | Status |
+|---|---|---:|---|---|
+| Structured memory layers | Store stable facts, preferences, tasks, episodes | On | None | Ready |
+| Pending turn queue | Buffer new memory candidates safely | On | None | Ready |
+| Queue-only lifecycle capture | Capture turns without direct structured writes | Off | None | Ready |
+| Batch governance | Absorb safe drafts and refresh graph/reports | On | None | Ready |
+| Exact search | Deterministic lookup over indexed memory | Optional build | None | Ready |
+| Semantic recall | Higher-quality recall across phrasing variants | External | `memory-lancedb-pro` | Recommended companion |
+| Dedupe / noop / merge | Prevent noisy re-writes and duplicate intake | On | None | Ready |
+| Fresh workspace smoke | Validate bootstrap → queue → governance flow | Manual/CI | None | Ready |
+
 ## Safe defaults
 - `autoTurnCapture = false`
 - `autoTurnQueueOnly = true`

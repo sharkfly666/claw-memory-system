@@ -13,6 +13,37 @@
 - dedupe / merge / supersede / noop
 - fresh workspace smoke 已通过
 
+## 一眼看懂架构
+```mermaid
+flowchart TD
+    A[OpenClaw 聊天 / 会话 / cron] --> B[agent_end 生命周期捕获\n启用后仅 queue-only]
+    B --> C[post-turn classifier]
+    C --> D[待处理队列\nturn_candidates.json]
+    D --> E[batch governance]
+    E --> F[draft / preview / merge / supersede / noop]
+    F --> G[结构化记忆层\nfacts / preferences / tasks / episodes]
+    G --> H[graph + reports]
+    G --> I[exact search index]
+    J[memory-lancedb-pro\n语义召回层] --> K[semantic recall / hybrid memory]
+    A --> K
+    I --> L[确定性检索]
+    H --> M[管理控制台 / 审计]
+    K --> M
+    L --> M
+```
+
+## 功能总览
+| 功能 | 作用 | 默认状态 | 依赖 | 当前状态 |
+|---|---|---:|---|---|
+| 结构化记忆层 | 保存 facts / preferences / tasks / episodes | 开 | 无 | 已完成 |
+| 待处理 turn 队列 | 安全缓冲新候选，不直接污染正式层 | 开 | 无 | 已完成 |
+| queue-only 生命周期捕获 | 自动捕获 turn，但默认不直写结构化层 | 关 | 无 | 已完成 |
+| batch governance | 自动吸收 safe drafts，刷新 graph / report | 开 | 无 | 已完成 |
+| exact search | 提供确定性检索能力 | 可选构建 | 无 | 已完成 |
+| semantic recall | 提供跨问法的高质量语义召回 | 外部配套 | `memory-lancedb-pro` | 推荐依赖 |
+| dedupe / noop / merge | 防止重复入队、重复写入、噪音更新 | 开 | 无 | 已完成 |
+| fresh workspace smoke | 验证 bootstrap → queue → governance 全链路 | 手动/CI | 无 | 已完成 |
+
 ## 默认安全策略
 - `autoTurnCapture = false`
 - `autoTurnQueueOnly = true`
