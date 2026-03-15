@@ -26,9 +26,9 @@
 ## 完整功能的必要依赖
 如果要获得完整语义召回能力，**必须同时安装并启用 `memory-lancedb-pro`**。
 
-推荐测试组合（`v0.1.0`）：
-- `openclaw >= 2026.2.0`
-- `claw-memory-system = 0.1.0`
+推荐测试组合（`v0.1.1`）：
+- `openclaw >= 2026.3.12`
+- `claw-memory-system = 0.1.1`
 - `memory-lancedb-pro >= 1.1.0-beta.8`
 
 推荐安装方式：
@@ -55,10 +55,23 @@ openclaw plugins enable memory-lancedb-pro
 ## 推荐使用流程
 1. 先安装并启用 `memory-lancedb-pro`
 2. 再安装并启用本插件
-3. 运行 bootstrap
-4. 构建 exact index（可选）
-5. 启用 batch governance 定时任务
-6. 如需生命周期自动捕获，再显式打开 `autoTurnCapture`
+3. 如果当前 OpenClaw 环境使用显式 allowlist，请把两个插件都加入 `plugins.allow`
+4. 运行 bootstrap
+5. 构建 exact index（可选）
+6. 启用 batch governance 定时任务
+7. 如需生命周期自动捕获，再显式打开 `autoTurnCapture`
+
+推荐 allowlist 示例：
+```json
+{
+  "plugins": {
+    "allow": [
+      "memory-lancedb-pro",
+      "claw-memory-system"
+    ]
+  }
+}
+```
 
 ## 关键文档
 - `docs/quickstart-openclaw-chat-install.zh-CN.md`

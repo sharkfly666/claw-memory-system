@@ -14,6 +14,8 @@
 - batch governance 默认启用，推荐每 6 小时跑一次
 - classifier 需要通过 `turnCaptureMinConfidence` 才会入队
 - 完整功能依赖 `memory-lancedb-pro` 作为语义召回层
+- 推荐运行版本更新为 `OpenClaw 2026.3.12+`
+- 若环境使用显式 allowlist，建议将 `memory-lancedb-pro` 与 `claw-memory-system` 一并加入 `plugins.allow`
 
 ## 已知限制
 - post-turn classifier 当前为规则型，不是 LLM-powered semantic classifier

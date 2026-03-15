@@ -19,9 +19,9 @@ openclaw plugins install https://github.com/CortexReach/memory-lancedb-pro
 openclaw plugins enable memory-lancedb-pro
 ```
 
-### 推荐测试组合（v0.1.0）
-- `openclaw >= 2026.2.0`
-- `claw-memory-system = 0.1.0`
+### 推荐测试组合（v0.1.1）
+- `openclaw >= 2026.3.12`
+- `claw-memory-system = 0.1.1`
 - `memory-lancedb-pro >= 1.1.0-beta.8`
 
 ### 缺少该依赖时的影响

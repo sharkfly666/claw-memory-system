@@ -27,9 +27,9 @@ The system does **not** directly write every captured turn into structured memor
 ## Required companion dependency for full functionality
 For full semantic recall, install and enable **`memory-lancedb-pro`** alongside this plugin.
 
-Recommended tested stack for `v0.1.0`:
-- `openclaw >= 2026.2.0`
-- `claw-memory-system = 0.1.0`
+Recommended tested stack for `v0.1.1`:
+- `openclaw >= 2026.3.12`
+- `claw-memory-system = 0.1.1`
 - `memory-lancedb-pro >= 1.1.0-beta.8`
 
 Recommended install path:
@@ -50,10 +50,23 @@ Without `memory-lancedb-pro`, this project still provides structured memory, que
 ## Recommended flow
 1. Install and enable `memory-lancedb-pro`
 2. Install and enable this plugin
-3. Run bootstrap
-4. Build the exact index (optional)
-5. Enable or keep the batch governance cron
-6. Only enable lifecycle auto capture explicitly when you want queue-only capture
+3. If your OpenClaw environment uses explicit plugin allowlists, add both plugins to `plugins.allow`
+4. Run bootstrap
+5. Build the exact index (optional)
+6. Enable or keep the batch governance cron
+7. Only enable lifecycle auto capture explicitly when you want queue-only capture
+
+Recommended allowlist example:
+```json
+{
+  "plugins": {
+    "allow": [
+      "memory-lancedb-pro",
+      "claw-memory-system"
+    ]
+  }
+}
+```
 
 ## Key docs
 - `docs/autonomous-memory-runtime.md`

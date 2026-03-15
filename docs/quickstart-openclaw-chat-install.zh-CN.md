@@ -34,6 +34,22 @@ openclaw plugins install <github-repo-url>
 openclaw plugins enable claw-memory-system
 ```
 
+### 3. 如果环境使用显式 allowlist，补齐 `plugins.allow`
+示例：
+
+```json
+{
+  "plugins": {
+    "allow": [
+      "memory-lancedb-pro",
+      "claw-memory-system"
+    ]
+  }
+}
+```
+
+如果未设置 allowlist，通常也可能运行；但对于 deep integration / readiness 检查和标准化安装体验，推荐明确配置。
+
 本地开发仓库也可：
 
 ```bash
